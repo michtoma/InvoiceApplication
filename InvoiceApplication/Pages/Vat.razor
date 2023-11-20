@@ -1,0 +1,16 @@
+﻿@inject IVatRateService vatService
+
+<h3>Vat</h3>
+<QuickGrid Items="vats.AsQueryable()">
+    <PropertyColumn Property="@(v=>v.Rate.ToString() + "%")" Title="stawka Vat"></PropertyColumn>
+</QuickGrid>
+
+
+@code {
+
+    List<VatRate> vats = new List<VatRate>();
+    protected override async Task OnInitializedAsync()
+    {
+        vats =await vatService.GetVatRatesAsync();
+    }
+}

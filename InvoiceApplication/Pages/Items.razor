@@ -1,0 +1,88 @@
+﻿@page "/Items"
+@inject IItemService service
+@inject IVatRateService vatService
+
+<PageTitle>Items</PageTitle>
+<div class="container-fluid">
+    <h3>Items</h3>
+    <button class="btn btn-outline-success" @onclick="addNew">Dodaj Nowy</button>
+    <br />
+    <div class="row">
+        @if (items is null)
+        {
+            <p>        Loading ....    </p>
+        }
+        else
+        {
+
+            <div class="col-xl-9 col-lg-auto">
+                <QuickGrid Items="items.AsQueryable()" Class="table table-striped table-bordered">
+                    <PropertyColumn Property="@(i => i.Name)" Sortable="true" Title="Nazwa" />
+                    <PropertyColumn Property="@(i=>i.Ean)" Sortable="true" />
+                    <PropertyColumn Property="@(i=>i.NetPrice + " zł")" Sortable="true" Title="Cena netto" />
+                    <PropertyColumn Property="@(i=>i.VatRate.Rate + " %")" Sortable="true" Title="Stawka Vat" />
+                    <PropertyColumn Property="@(i=>i.GrossPrice.ToString("0.00") + " zł")" Sortable="true" Title="Cena brutto" />
+                    <PropertyColumn Property="@(i=>i.Quantity + " " + i.UnitOfMeasure.ShortName)" Sortable="true" Title="Ilość" />
+                    <TemplateColumn Title="Actions">
+                        <button class="btn btn-secondary" @onclick="(e => Edit(context.Id))">Edit</button>
+                        <button class="btn btn-danger" @onclick="(e => Delete(context.Id))">Delete</button>
+                    </TemplateColumn>
+
+                </QuickGrid>
+
+            </div>
+        }
+        @if (addNewVisisble)
+        {
+            <ItemsOperations itemId="itemId" isVisible="addNewVisisble" OnClick="ClickHandler"></ItemsOperations>
+        }
+    </div>
+</div>
+
+
+@code {
+    private bool addNewVisisble = false;
+    int itemId;
+    bool isNew = true;
+    Item item = new Item();
+    List<Item> items = new List<Item>();
+    protected override async Task OnInitializedAsync()
+    {
+        items = await service.GetAllItems();
+        item = new Item();
+    }
+    private void addNew()
+    {
+        itemId = 0;
+        item = new Item();
+        isNew = true;
+        addNewVisisble = true;
+
+    }
+    private async void Edit(int Id)
+    {
+        item = await service.GetItemById(Id);
+        itemId = Id;
+        if (item.Id == Id)
+        {
+            isNew = false;
+            addNewVisisble = true;
+        }
+    }
+    private async void Delete(int id)
+    {
+        item = await service.GetItemById(id);
+        if (item.Id == id)
+        {
+            await service.DeleteItem(item);
+            await OnInitializedAsync();
+            StateHasChanged();
+        }
+    }
+    async void ClickHandler()
+    {
+        await OnInitializedAsync();
+        addNewVisisble = false;
+        StateHasChanged();
+    }
+}
