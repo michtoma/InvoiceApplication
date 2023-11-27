@@ -85,7 +85,7 @@
         unitOfMeasures = await measurService.GetAllMeasureAsync();
         if (itemId != 0)
         {
-            item = await itemService.GetItemById((int)itemId);
+            item = await itemService.GetItemByIdAsync((int)itemId);
             isNew = false;
         }
         else
@@ -100,12 +100,12 @@
     {
         if (isNew)
         {
-            await itemService.AddNewItem(item);
+            await itemService.AddNewItemAsync(item);
             Close();
         }
         else
         {
-            await itemService.UpdateItem(item);
+            await itemService.UpdateItemAsync(item);
             Close();
         }
     }

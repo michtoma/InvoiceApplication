@@ -14,25 +14,25 @@ namespace InvoiceApplication.Services.Items
             _context = context;
         }
 
-        public async Task AddNewItem(Item item)
+        public async Task AddNewItemAsync(Item item)
         {
             _context.Add(item);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteItem(Item item)
+        public async Task DeleteItemAsync(Item item)
         {
             _context.Remove(item);
             await _context.SaveChangesAsync();
 
         }
 
-        public async Task<List<Item>> GetAllItems()
+        public async Task<List<Item>> GetAllItemsAsync()
         {
             return await _context.Item.Include(v => v.VatRate).Include(i=>i.UnitOfMeasure).ToListAsync();
         }
 
-        public async Task<Item> GetItemById(int id)
+        public async Task<Item> GetItemByIdAsync(int id)
         {
 
             var item = await _context.Item.FindAsync(id);
@@ -48,7 +48,7 @@ namespace InvoiceApplication.Services.Items
             }
         }
 
-        public async Task UpdateItem(Item item)
+        public async Task UpdateItemAsync(Item item)
         {
             var existingItem = await _context.Item.FindAsync(item.Id);
 

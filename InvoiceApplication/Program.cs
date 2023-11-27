@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using InvoiceApplication.Data;
 using InvoiceApplication.Services.Items;
+using InvoiceApplication.Services.Invoices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<IItemService,ItemService>();
 builder.Services.AddScoped<IVatRateService,VatRateService>();
 builder.Services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 var app = builder.Build();
 

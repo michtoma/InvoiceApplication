@@ -7,17 +7,13 @@ namespace InvoiceApplication.Models.Invoices
         public int Id { get; set; }
         public string Number { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
-        public DateTime DateOfIssue { get; set; }
+        public DateTime DateOfIssue { get; set; } = DateTime.Now;
         public int DaysOfPaiment { get; set; }
         public DateTime PaymentDate
         {
             get
             {
-                return PaymentDate;
-            }
-            set
-            {
-                DateOfIssue.AddDays(DaysOfPaiment);
+              return DateOfIssue.AddDays(DaysOfPaiment);
             }
         }
         public bool IsPaid { get; set; } = false;

@@ -1,0 +1,41 @@
+﻿@using Microsoft.AspNetCore.Components.Web;
+
+@if (modalMessage.isVisible)
+{
+    <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalChoice">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="mb-0">@modalMessage.Title</h5>
+                    <p class="mb-0">@modalMessage.Body</p>
+                </div>
+                @if (modalMessage.Type == ModalType.Confirm)
+                {
+                <div class="modal-footer flex-nowrap p-0">
+                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end" @onclick="onConfirm"><strong>Yes, confirm</strong></button>
+                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0" data-bs-dismiss="modal" @onclick="onCancel">No thanks</button>
+                    </div>
+                }
+                else
+                {
+                <div class="modal-footer flex-nowrap p-0">
+                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0" data-bs-dismiss="modal" @onclick="onCancel">Close</button>
+                </div>
+                    
+                }
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    [Parameter]
+    public ModalMessage modalMessage { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> onConfirm { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> onCancel { get; set; }
+
+
+}

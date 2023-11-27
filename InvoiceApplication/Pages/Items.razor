@@ -43,38 +43,35 @@
 @code {
     private bool addNewVisisble = false;
     int itemId;
-    bool isNew = true;
     Item item = new Item();
     List<Item> items = new List<Item>();
     protected override async Task OnInitializedAsync()
     {
-        items = await service.GetAllItems();
+        items = await service.GetAllItemsAsync();
         item = new Item();
     }
     private void addNew()
     {
         itemId = 0;
         item = new Item();
-        isNew = true;
         addNewVisisble = true;
 
     }
     private async void Edit(int Id)
     {
-        item = await service.GetItemById(Id);
+        item = await service.GetItemByIdAsync(Id);
         itemId = Id;
         if (item.Id == Id)
         {
-            isNew = false;
             addNewVisisble = true;
         }
     }
     private async void Delete(int id)
     {
-        item = await service.GetItemById(id);
+        item = await service.GetItemByIdAsync(id);
         if (item.Id == id)
         {
-            await service.DeleteItem(item);
+            await service.DeleteItemAsync(item);
             await OnInitializedAsync();
             StateHasChanged();
         }

@@ -4,10 +4,10 @@ namespace InvoiceApplication.Services.Items
 {
     public interface IItemService
     {
-        Task<List<Item>> GetAllItems();
-        Task AddNewItem(Item item);
-        Task UpdateItem(Item item);
-        Task DeleteItem(Item item);
-        Task<Item> GetItemById(int id);
+        Task<List<Item>> GetAllItemsAsync();
+        Task AddNewItemAsync(Item item);
+        Task UpdateItemAsync(Item item);
+        Task DeleteItemAsync(Item item);
+        Task<Item> GetItemByIdAsync(int id);
     }
 }

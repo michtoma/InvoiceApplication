@@ -6,7 +6,7 @@ namespace InvoiceApplication.Models.Items
     public class InvoiceItems
     {
         public int Id { get; set; }
-        public Item Item { get; set; }
+        public Item? Item { get; set; }
         public int ItemId { get; set; }
         public double Quantity { get; set; }
         [Required(ErrorMessage = "Price is required")]
@@ -33,13 +33,9 @@ namespace InvoiceApplication.Models.Items
         {
             get
             {
-                if (VatRate == null) return 0;
                 return TotalNetValue * VatRate / 100 + TotalNetValue;
             }
         }
-
     }
-
-
 }
 
