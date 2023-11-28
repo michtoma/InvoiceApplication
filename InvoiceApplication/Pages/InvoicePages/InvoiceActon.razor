@@ -1,0 +1,200 @@
+﻿@page "/invoiceAction"
+@page "/invoiceAction/{invoiceId:int?}"
+@using InvoiceApplication.Pages.ModalPages
+@inject IInvoiceService _invoiceService
+@inject IItemService _itemService
+@inject IInvoiceItemService _invItemService
+<PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
+<ModalWindow modalMessage="modalModel" onCancel="onCancel" onConfirm="onConfirm"></ModalWindow>
+<ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
+<h3>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
+<EditForm Model="invoice" OnValidSubmit="HeaderConirmation">
+    <DataAnnotationsValidator />
+    <div class="row">
+
+        <div class="col-3">
+            <label for="number">Number</label>
+            <InputText id="number" @bind-Value="invoice.Number" class="form-control"></InputText>
+            <ValidationMessage For="@(() => invoice.Number)" />
+        </div>
+        <div class="col-3">
+            <label for="createDate">Create Date</label>
+            <InputDate id="createDate" @bind-Value="invoice.CreateDate" class="form-control"></InputDate>
+            <ValidationMessage For=@(()=>invoice.CreateDate) />
+        </div>
+        <div class="col-3">
+            <label for="issueDate">Issue Date</label>
+            <InputDate id="createDate" @bind-Value="invoice.DateOfIssue" class="form-control"></InputDate>
+            <ValidationMessage For=@(()=>invoice.DateOfIssue) />
+        </div>
+        <div class="col-3">
+            <label for="days">Payment term</label>
+            <InputNumber id="days" @bind-Value="invoice.DaysOfPaiment" class="form-control"></InputNumber>
+            <ValidationMessage For=@(()=>invoice.DaysOfPaiment) />
+        </div>
+    </div>
+    <div>
+        <label>Payment deadline: @DateOnly.FromDateTime(invoice.PaymentDate)</label>
+    </div>
+    <div>
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="invoice.Description" class="form-control"></InputText>
+        <ValidationMessage For=@(()=>invoice.Description) />
+    </div>
+    <button class="btn btn-success my-2" type="submit">@((invoiceId == null || invoiceId == 0) ? "Save Invoice" : "Update Invoice")</button>
+</EditForm>
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Item Name</th>
+                    <th>Unit</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total Net Value</th>
+                    <th>VAT Rate</th>
+                    <th>Total Gross Value</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
+                {
+                    <tr>
+                        <td>@(index + 1)</td>
+                        <td>@item.Item.Name</td>
+                        <td>@item.Item.UnitOfMeasure.ShortName</td>
+                        <td>@item.NetPrice.ToString("0.00")</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.TotalNetValue.ToString("0.00")</td>
+                        <td>@item.VatRate</td>
+                        <td>@item.TotalGrossValue.ToString("0.00")</td>
+                        <td><button class="btn btn-dark" @onclick="(i=> EditInvoiceItem(item.Id))">Edit</button> | <button class="btn btn-danger" @onclick="(i=> DeleteInvoiceItem(item.Id))">Delete</button></td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="4"></td>
+                    <th>Total:</th>
+                    <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
+                    <td>XXX</td>
+                    <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+@if (!(invoiceId == null || invoiceId == 0))
+{
+    <button class="btn btn-outline-secondary" @onclick="showItemsModal">Add Item to Invoice </button>
+}
+<a class="btn btn-secondary my-2" href=" Invoices">Back to Invoice List </a>
+@code {
+    bool modalConfirmed = false;
+    [Parameter]
+    public int? invoiceId { get; set; }
+    ModalMessage modalModel = new();
+    Invoice invoice = new();
+    List<Item> items = new();
+    bool isVisibleItemsModal = false;
+    protected override async Task OnInitializedAsync()
+    {
+        items = await _itemService.GetAllItemsAsync();
+        if (!(invoiceId == 0 || invoiceId == null))
+        {
+            invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
+        }
+    }
+    void HeaderConirmation()
+    {
+        if (invoiceId == null || invoiceId == 0)
+        {
+            modalModel.Body = "Are you sure to add a new invoice " + invoice.Number;
+            modalModel.Title = "Confirm:";
+
+        }
+        else
+        {
+            modalModel.Body = "Are you sure you want to modify the invoice header " + invoice.Number;
+            modalModel.Title = "Confirm:";
+
+        }
+        modalModel.Type = ModalType.Confirm;
+        modalModel.isVisible = true;
+
+    }
+    void ConfirmInvoice()
+    {
+        modalModel.Body = "Are you sure to add the item to the invoice " + invoice.Number + "?";
+        modalModel.Title = "Confirm:";
+        modalModel.Type = ModalType.Confirm;
+        modalModel.isVisible = true;
+
+    }
+    private async void onConfirm(MouseEventArgs e)
+    {
+        modalConfirmed = true;
+        modalModel = new();
+        @if (await _invoiceService.InvoiceExist(invoice.Id))
+        {
+            await _invoiceService.UpdateInvoiceAsync(invoice);
+        }
+        else
+        {
+            await _invoiceService.AddInvoiceAsync(invoice);
+            invoiceId = invoice.Id;
+        }
+        modalModel.Type = ModalType.Success;
+        modalModel.Title = "Succes";
+        modalModel.Body = "Saved";
+        modalModel.isVisible = true;
+        StateHasChanged();
+
+
+    }
+    private async void AddItemFromModalItems(int ItemId)
+    {
+        InvoiceItems invoiceItem = new();
+        var selectedItem = items.FirstOrDefault(i => i.Id == ItemId);
+        invoiceItem.ItemId = selectedItem.Id;
+        invoiceItem.VatRate = selectedItem.VatRate.Rate;
+        invoiceItem.InvoiceId = invoice.Id;
+        await _invItemService.AddInvoiceItemAsync(invoiceItem);
+        isVisibleItemsModal = false;
+        modalModel.Type = ModalType.Success;
+        modalModel.Title = "Success";
+        modalModel.Body = "The item has been successfully added to the invoice";
+        modalModel.isVisible = true;
+        StateHasChanged();
+
+    }
+    private void EditInvoiceItem(int invoiceItemId)
+    {
+
+    }
+    private async void DeleteInvoiceItem(int invoiceItemId)
+    {
+        await _invItemService.DeleteInvoiceItemByIdAsync(invoiceItemId);
+        modalModel.Type = ModalType.Success;
+        modalModel.Title = "Success";
+        modalModel.Body = "The item has been successfully deleted from the invoice";
+        modalModel.isVisible = true;
+        invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
+        StateHasChanged();
+
+    }
+    private void showItemsModal()
+    {
+        isVisibleItemsModal = true;
+    }
+    private void CloseItemsModal()
+    {
+        isVisibleItemsModal = false;
+    }
+    private void onCancel(MouseEventArgs e)
+    {
+        modalModel = new();
+        StateHasChanged();
+
+    }
+
+}

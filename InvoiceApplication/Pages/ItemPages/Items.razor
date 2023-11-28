@@ -5,9 +5,13 @@
 <PageTitle>Items</PageTitle>
 <div class="container-fluid">
     <h3>Items</h3>
-    <button class="btn btn-outline-success" @onclick="addNew">Dodaj Nowy</button>
+    <button class="btn btn-outline-success mb-2" @onclick="addNew">Dodaj Nowy</button>
     <br />
     <div class="row">
+        @if (addNewVisisble)
+        {
+            <ItemsOperations itemId="itemId" isVisible="addNewVisisble" OnClickClose="ClickHandler"></ItemsOperations>
+        }
         @if (items is null)
         {
             <p>        Loading ....    </p>
@@ -15,14 +19,15 @@
         else
         {
 
-            <div class="col-xl-9 col-lg-auto">
+            <div>
                 <QuickGrid Items="items.AsQueryable()" Class="table table-striped table-bordered">
-                    <PropertyColumn Property="@(i => i.Name)" Sortable="true" Title="Nazwa" />
+                    <PropertyColumn Property="@(i => i.Name)" Sortable="true" />
                     <PropertyColumn Property="@(i=>i.Ean)" Sortable="true" />
-                    <PropertyColumn Property="@(i=>i.NetPrice + " zł")" Sortable="true" Title="Cena netto" />
-                    <PropertyColumn Property="@(i=>i.VatRate.Rate + " %")" Sortable="true" Title="Stawka Vat" />
-                    <PropertyColumn Property="@(i=>i.GrossPrice.ToString("0.00") + " zł")" Sortable="true" Title="Cena brutto" />
-                    <PropertyColumn Property="@(i=>i.Quantity + " " + i.UnitOfMeasure.ShortName)" Sortable="true" Title="Ilość" />
+                    <PropertyColumn Property="@(i=>i.NetPrice)" Format="0.00 zł" Sortable="true" Title="Nett Price" />
+                    <PropertyColumn Property="@(i=>i.VatRate.Rate + " %")" Sortable="true" Title="Vat Rate" />
+                    <PropertyColumn Property="@(i=>i.GrossPrice)" Format="0.00 zł" Sortable="true" Title="Gross Price" />
+                    <PropertyColumn Property="@(i=>i.Quantity)" Sortable="true" Title="Quantity" />
+                    <PropertyColumn Property="@(i=>i.UnitOfMeasure.ShortName)" Sortable="true" Title="Unit" />
                     <TemplateColumn Title="Actions">
                         <button class="btn btn-secondary" @onclick="(e => Edit(context.Id))">Edit</button>
                         <button class="btn btn-danger" @onclick="(e => Delete(context.Id))">Delete</button>
@@ -31,10 +36,6 @@
                 </QuickGrid>
 
             </div>
-        }
-        @if (addNewVisisble)
-        {
-            <ItemsOperations itemId="itemId" isVisible="addNewVisisble" OnClick="ClickHandler"></ItemsOperations>
         }
     </div>
 </div>
@@ -76,10 +77,10 @@
             StateHasChanged();
         }
     }
-    async void ClickHandler()
+    private async void ClickHandler()
     {
-        await OnInitializedAsync();
         addNewVisisble = false;
+        items = await service.GetAllItemsAsync();
         StateHasChanged();
     }
 }

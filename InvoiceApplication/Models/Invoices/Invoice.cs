@@ -1,6 +1,4 @@
-﻿using InvoiceApplication.Models.Items;
-
-namespace InvoiceApplication.Models.Invoices
+﻿namespace InvoiceApplication.Models.Invoices
 {
     public class Invoice
     {
@@ -17,6 +15,7 @@ namespace InvoiceApplication.Models.Invoices
             }
         }
         public bool IsPaid { get; set; } = false;
+        public bool IsEditable { get; set; } = true;
         public string Description { get; set; } = string.Empty;
         public List<InvoiceItems> InvoiceItems { get; set; } = new List<InvoiceItems>();
         public double TotaNetlValue

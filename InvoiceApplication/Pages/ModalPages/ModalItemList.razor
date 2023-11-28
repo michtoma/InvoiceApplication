@@ -1,0 +1,51 @@
+﻿@inject IItemService service
+
+
+@if (isVisible)
+{
+    <div class="modal modal-dialog-centered modal-dialog-scrollable" tabindex="-1" role="dialog" id="modalChoice" >
+        <div class="modal-dialog" role="dialog">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-header text-center">
+                        Items List
+                </div>
+                <div class="modal-body p-4 text-center">
+                    @if (items is not null)
+                    {
+
+                        <QuickGrid Items="items.AsQueryable()" Pagination="paginationState" Class="table table-bordered table-striped">
+                            <PropertyColumn Property="i=>i.Name"></PropertyColumn>
+                            <PropertyColumn Property="i=>i.Ean"></PropertyColumn>
+                            <TemplateColumn Title="Action">
+                                <button class="btn btn-success" @onclick="(c=> AddItemAction(context.Id))">Add</button>
+                            </TemplateColumn>
+                        </QuickGrid>
+                        <Paginator Value="paginationState" />
+
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="OnCLickClose">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool isVisible { get; set; }
+    [Parameter]
+    public List<Item> items { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnCLickClose { get; set; }
+    [Parameter]
+    public EventCallback<int> OnCLickAdd { get; set; }
+
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
+    private void AddItemAction(int itemId)
+    {
+        OnCLickAdd.InvokeAsync(itemId);
+    }
+
+}

@@ -36,12 +36,12 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task<List<Invoice>> GetAllInvoiceAsync()
         {
-            return await _context.Invoice.ToListAsync();
+            return await _context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).ToListAsync();
         }
 
         public async Task<Invoice> GetInvoiceByIdAsync(int id)
         {
-            var invoice = await _context.Invoice.FindAsync(id);
+            var invoice = await _context.Invoice.Include(i => i.InvoiceItems).ThenInclude(i=>i.Item).ThenInclude(i=>i.UnitOfMeasure).FirstOrDefaultAsync(i=> i.Id == id);
 
             if (invoice != null)
             {
@@ -52,6 +52,12 @@ namespace InvoiceApplication.Services.Invoices
             {
                 throw new InvalidOperationException("Invoice not found");
             }
+        }
+
+        public async Task<bool> InvoiceExist(int invoiceId)
+        {
+            var invoice = await _context.Invoice.FindAsync(invoiceId);
+            return invoice != null;
         }
 
         public async Task UpdateInvoiceAsync(Invoice invoice)

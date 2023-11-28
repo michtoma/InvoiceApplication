@@ -17,7 +17,7 @@ namespace InvoiceApplication.Models.Items
         public VatRate? VatRate { get; set; }
         public int VatRateID { get; set; } = 1;
         public UnitOfMeasure? UnitOfMeasure { get; set; }
-        public int UnitOfMeasureId { get; set; } = 1; 
+        public int UnitOfMeasureId { get; set; } = 1;
         [NotMapped]
         public double GrossPrice
         {
@@ -44,6 +44,16 @@ namespace InvoiceApplication.Models.Items
                 return TotalNetValue * VatRate.Rate / 100 + TotalNetValue;
             }
         }
-
+        public void SetNetPriceByGross(double grossPrice)
+        {
+            if (VatRate != null)
+            {
+                if (VatRate.Rate == 0) NetPrice = grossPrice;
+                else
+                {
+                    NetPrice = grossPrice / VatRate.Rate / 100;
+                }
+            }
+        }
     }
 }

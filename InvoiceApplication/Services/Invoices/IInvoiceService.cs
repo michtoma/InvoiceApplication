@@ -9,5 +9,6 @@ namespace InvoiceApplication.Services.Invoices
         Task UpdateInvoiceAsync(Models.Invoices.Invoice invoice);
         Task DeleteInvoiceAsync(Models.Invoices.Invoice invoice);
         Task AddInvoiceAsync(Models.Invoices.Invoice invoice);
-    }
+        Task <bool> InvoiceExist(int invoiceId);
+     }
 }

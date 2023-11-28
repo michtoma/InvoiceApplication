@@ -18,6 +18,7 @@ builder.Services.AddScoped<IItemService,ItemService>();
 builder.Services.AddScoped<IVatRateService,VatRateService>();
 builder.Services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IInvoiceItemService, InvoiceItemService>();
 
 var app = builder.Build();
 

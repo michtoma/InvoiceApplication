@@ -1,0 +1,133 @@
+﻿@inject IItemService itemService
+@inject IVatRateService vatService
+@inject IUnitOfMeasureService measurService
+@if (isVisible)
+{
+    <div class="modal modal-dialog-centered" tabindex="-1" role="dialog" id="modalChoice">
+        <div class="modal-dialog" role="dialog">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="mb-0">Items Operations</h5>
+
+                    <EditForm Model="item" OnValidSubmit="SubmitForm">
+                        <DataAnnotationsValidator />
+                        <div class="row">
+                            <div style="display: none;">
+                                <label for="id">Id</label>
+                                <InputNumber id="id" @bind-Value="item.Id" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => item.Id)" />
+                            </div>
+                            <div class="col-4">
+                                <label for="ean">Ean</label>
+                                <InputText id="ean" @bind-Value="item.Ean" class="form-control"></InputText>
+                                <ValidationMessage For="@(() => item.Ean)" />
+                            </div>
+                            <div class="col-8">
+                                <label for="name">Name</label>
+                                <InputText id="name" @bind-Value="item.Name" class="form-control"></InputText>
+                                <ValidationMessage For="@(() => item.Name)" />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="description">Description</label>
+                            <InputText id="description" @bind-Value="item.Description" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => item.Description)" />
+                        </div>
+                        <div>
+                            <label for="comments">Comments</label>
+                            <InputText id="comments" @bind-Value="item.Comments" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => item.Comments)" />
+                        </div>
+                        <div class="row">
+
+                            <div class="col-6">
+                                <label for="vatRate">VatRate</label>
+                                <InputSelect id="vatRate" @bind-Value="item.VatRateID" class="form-control">
+                                    @foreach (var vatRate in vatRates)
+                                    {
+                                        <option value="@vatRate.Id">@vatRate.Rate</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="col-6">
+                                <label for="unitOfMeasure">Unit of Measure</label>
+                                <InputSelect id="unitOfMeasure" @bind-Value="item.UnitOfMeasureId" class="form-control">
+                                    @foreach (var unitOfMeasure in unitOfMeasures)
+                                    {
+                                        <option value="@unitOfMeasure.Id">@unitOfMeasure.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-6">
+                                <label for="netPrice">NetPrice</label>
+                                <InputNumber id="netPrice" @bind-Value="item.NetPrice" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => item.NetPrice)" />
+                            </div>
+                            <div class="col-6 ">
+                                <label for="quantity">Quantity</label>
+                                <InputNumber id="quantity" @bind-Value="item.Quantity" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => item.Quantity)" />
+                            </div>
+
+                        </div>
+                        <div class="m-3">
+                            <button type="submit" class="btn btn-primary">@(isNew ? "Create Item" : "Update Item")</button>
+                            <button class="btn btn-dark" @onclick="Close">Close</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<UnitOfMeasure> unitOfMeasures = new List<UnitOfMeasure>();
+    List<VatRate> vatRates = new List<VatRate>();
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+    [Parameter]
+    public int? itemId { get; set; }
+    [Parameter]
+    public bool isVisible { get; set; }
+    Item item = new Item();
+    bool isNew = true;
+    protected override async Task OnParametersSetAsync()
+    {
+        vatRates = await vatService.GetVatRatesAsync();
+        unitOfMeasures = await measurService.GetAllMeasureAsync();
+        if (itemId != 0)
+        {
+            item = await itemService.GetItemByIdAsync((int)itemId);
+            isNew = false;
+        }
+        else
+        {
+            item = new Item();
+            isNew = true;
+        }
+
+    }
+
+    private async void SubmitForm()
+    {
+        if (isNew)
+        {
+            await itemService.AddNewItemAsync(item);
+            Close();
+        }
+        else
+        {
+            await itemService.UpdateItemAsync(item);
+            Close();
+        }
+    }
+    private async void Close()
+    {
+        isVisible = false;
+        await OnClickClose.InvokeAsync();
+
+    }
+
+        }

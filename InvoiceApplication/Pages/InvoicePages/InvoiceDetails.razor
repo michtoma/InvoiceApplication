@@ -1,0 +1,109 @@
+﻿@page "/invoice/{invoiceId:int?}"
+@inject IInvoiceService service
+@inject NavigationManager navigationManager
+<PageTitle>Invoice Details</PageTitle>
+<h3>Invoice Details</h3>
+@if (invoice is null)
+{
+    <h1>It looks like there's nothing here.</h1>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <td>@invoice.Number</td>
+            </tr>
+            <tr>
+                <th>Create Date</th>
+                <td>@invoice.CreateDate.ToShortDateString()</td>
+            </tr>
+            <tr>
+                <th>Issue Date</th>
+                <td>@invoice.DateOfIssue.ToShortDateString()</td>
+            </tr>
+            <tr>
+                <th>Payment term</th>
+                <td>@invoice.DaysOfPaiment</td>
+            </tr>
+            <tr>
+                <th>Payment date</th>
+                <td>@invoice.PaymentDate.ToShortDateString()</td>
+            </tr>
+        </thead>
+        <tbody>
+            @if (invoice.InvoiceItems.Any())
+            {
+                <tr>
+                    <td colspan="8">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Item Name</th>
+                                    <th>Unit</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total Net Value</th>
+                                    <th>VAT Rate</th>
+                                    <th>Total Gross Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
+                                {
+                                    <tr>
+                                        <td>@(index + 1)</td>
+                                        <td>@item.Item.Name</td>
+                                        <td>@item.Item.UnitOfMeasure.ShortName</td>
+                                        <td>@item.NetPrice.ToString("0.00")</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.TotalNetValue.ToString("0.00")</td>
+                                        <td>@item.VatRate</td>
+                                        <td>@item.TotalGrossValue.ToString("0.00")</td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <td colspan="4"></td>
+                                    <th>Total:</th>
+                                    <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
+                                    <td>XXX</td>
+                                    <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8">
+                        <p>No items in the invoice.</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-secondary my-2" @onclick="BackToInvoiceList">Back to Invoice List</button>
+
+
+@code {
+    [Parameter]
+    public int invoiceId { get; set; }
+    private Invoice invoice;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!(invoiceId == 0))
+            invoice = await service.GetInvoiceByIdAsync((int)invoiceId);
+    }
+    private void BackToInvoiceList()
+    {
+        navigationManager.NavigateTo("/invoices");
+    }
+}
