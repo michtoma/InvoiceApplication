@@ -72,6 +72,7 @@ namespace InvoiceApplication.Services.Invoices
                     existingInvoiceItem.Quantity = invoiceItem.Quantity;
                     existingInvoiceItem.NetPrice = invoiceItem.NetPrice;
                     existingInvoiceItem.VatRate = invoiceItem.VatRate;
+                    existingInvoiceItem.Description = invoiceItem.Description;
                     await _context.SaveChangesAsync();
                 }
                 else

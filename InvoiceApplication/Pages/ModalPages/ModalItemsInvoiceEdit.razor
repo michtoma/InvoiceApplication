@@ -25,7 +25,7 @@
                         </div>
                         <div>
                             <label for="description">Description</label>
-                            <InputText id="description" @bind-Value="item.Description" class="form-control"></InputText>
+                            <InputTextArea id="description" @bind-Value="item.Description" class="form-control"></InputTextArea>
                             <ValidationMessage For="@(() => item.Description)" />
                         </div>
                         <div class="row">
@@ -61,11 +61,14 @@
     public InvoiceItems item { get; set; }
     [Parameter]
     public bool isVisible { get; set; }
+    [Parameter]
+    public bool wasEdited { get; set; }
     bool isNew = true;
     private async void SubmitForm()
     {
 
         await invItemService.UpdateInvoiceItemAsync(item);
+        wasEdited = true;
         Close();
 
     }

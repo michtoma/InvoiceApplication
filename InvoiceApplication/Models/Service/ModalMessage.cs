@@ -6,5 +6,6 @@
         public string Body { get; set; } = string.Empty;
         public ModalType Type { get; set; } = ModalType.Info;
         public bool isVisible { get; set; } = false;
+        public int? idToDelte { get; set; }
     }
 }

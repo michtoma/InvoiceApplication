@@ -5,7 +5,7 @@
 @inject IItemService _itemService
 @inject IInvoiceItemService _invItemService
 <PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
-    <ModalWindow modalMessage="modalModel" onCancel="onCancel" onConfirm="onConfirm"></ModalWindow>
+    <ModalWindow modalMessage="modalModelMessage" onCancel="onCancel" onConfirm="onConfirm" forDelete="toDelete"></ModalWindow>
     <ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
     <ModalItemsInvoiceEdit @ref="modalInvItemEdit" OnClickClose="CloseEditInvoiceItem"></ModalItemsInvoiceEdit>
     <h3>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
@@ -64,7 +64,12 @@
             {
                 <tr>
                     <td>@(index + 1)</td>
-                    <td>@item.Item.Name</td>
+                    <td>@item.Item.Name @if (item.Description != "")
+                        {
+                            <br /> 
+                            @item.Description
+                        }
+                    </td>
                     <td>@item.Item.UnitOfMeasure.ShortName</td>
                     <td>@item.NetPrice.ToString("0.00")</td>
                     <td>@item.Quantity</td>
@@ -95,9 +100,10 @@
 </div>
 @code {
     bool modalConfirmed = false;
+    bool toDelete = false;
     [Parameter]
     public int? invoiceId { get; set; }
-    ModalMessage modalModel = new();
+    ModalMessage modalModelMessage = new();
     Invoice invoice = new();
     List<Item> items = new();
     ModalItemsInvoiceEdit modalInvItemEdit;
@@ -114,45 +120,53 @@
     {
         if (invoiceId == null || invoiceId == 0)
         {
-            modalModel.Body = "Are you sure to add a new invoice " + invoice.Number;
-            modalModel.Title = "Confirm:";
+            modalModelMessage.Body = "Are you sure to add a new invoice " + invoice.Number;
+            modalModelMessage.Title = "Confirm:";
 
         }
         else
         {
-            modalModel.Body = "Are you sure you want to modify the invoice header " + invoice.Number;
-            modalModel.Title = "Confirm:";
+            modalModelMessage.Body = "Are you sure you want to modify the invoice header " + invoice.Number;
+            modalModelMessage.Title = "Confirm:";
 
         }
-        modalModel.Type = ModalType.Confirm;
-        modalModel.isVisible = true;
+        modalModelMessage.Type = ModalType.Confirm;
+        modalModelMessage.isVisible = true;
 
     }
     void ConfirmInvoice()
     {
-        modalModel.Body = "Are you sure to add the item to the invoice " + invoice.Number + "?";
-        modalModel.Title = "Confirm:";
-        modalModel.Type = ModalType.Confirm;
-        modalModel.isVisible = true;
+        modalModelMessage.Body = "Are you sure to add the item to the invoice " + invoice.Number + "?";
+        modalModelMessage.Title = "Confirm:";
+        modalModelMessage.Type = ModalType.Confirm;
+        modalModelMessage.isVisible = true;
 
     }
     private async void onConfirm(MouseEventArgs e)
     {
         modalConfirmed = true;
-        modalModel = new();
-        @if (await _invoiceService.InvoiceExist(invoice.Id))
+        if (modalModelMessage.idToDelte != null)
+        {
+            DeleteInvoiceItemConfirmed();
+
+        }
+        else if (await _invoiceService.InvoiceExist(invoice.Id))
         {
             await _invoiceService.UpdateInvoiceAsync(invoice);
+            modalModelMessage.Type = ModalType.Success;
+            modalModelMessage.Title = "Succes";
+            modalModelMessage.Body = "Saved";
+            modalModelMessage.isVisible = true;
         }
         else
         {
             await _invoiceService.AddInvoiceAsync(invoice);
             invoiceId = invoice.Id;
+            modalModelMessage.Type = ModalType.Success;
+            modalModelMessage.Title = "Succes";
+            modalModelMessage.Body = "Saved";
+            modalModelMessage.isVisible = true;
         }
-        modalModel.Type = ModalType.Success;
-        modalModel.Title = "Succes";
-        modalModel.Body = "Saved";
-        modalModel.isVisible = true;
         StateHasChanged();
 
 
@@ -166,10 +180,10 @@
         invoiceItem.InvoiceId = invoice.Id;
         await _invItemService.AddInvoiceItemAsync(invoiceItem);
         isVisibleItemsModal = false;
-        modalModel.Type = ModalType.Success;
-        modalModel.Title = "Success";
-        modalModel.Body = "The item has been successfully added to the invoice";
-        modalModel.isVisible = true;
+        modalModelMessage.Type = ModalType.Success;
+        modalModelMessage.Title = "Success";
+        modalModelMessage.Body = "The item has been successfully added to the invoice";
+        modalModelMessage.isVisible = true;
         StateHasChanged();
 
     }
@@ -181,18 +195,55 @@
     }
     private async void CloseEditInvoiceItem()
     {
-        modalInvItemEdit.isVisible = false;
-        StateHasChanged();
+        if (modalInvItemEdit.wasEdited)
+        {
+            modalInvItemEdit.isVisible = false;
+            StateHasChanged();
+            modalModelMessage.Body = "The invoice item has been updated";
+            modalModelMessage.Title = "Success";
+            modalModelMessage.Type = ModalType.Success;
+            modalModelMessage.isVisible = true;
+
+        }
+        else
+        {
+            modalInvItemEdit.isVisible = false;
+            StateHasChanged();
+        }
     }
     private async void DeleteInvoiceItem(int invoiceItemId)
     {
-        await _invItemService.DeleteInvoiceItemByIdAsync(invoiceItemId);
-        modalModel.Type = ModalType.Success;
-        modalModel.Title = "Success";
-        modalModel.Body = "The item has been successfully deleted from the invoice";
-        modalModel.isVisible = true;
-        invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
+        var invoiceItemToDelete = await _invItemService.GetInvoiceItemByIdAsync(invoiceItemId);
+        modalModelMessage.Type = ModalType.Danger;
+        modalModelMessage.Title = "Warrning";
+        modalModelMessage.Body = $"Do you realy want delete {invoiceItemToDelete.Item.Name} ???";
+        modalModelMessage.isVisible = true;
+        modalModelMessage.idToDelte = invoiceItemId;
         StateHasChanged();
+
+    }
+    private async void DeleteInvoiceItemConfirmed()
+    {
+        if (modalModelMessage.idToDelte == null || modalModelMessage.idToDelte == 0)
+        {
+            modalModelMessage.Type = ModalType.Error;
+            modalModelMessage.Title = "Something went wrong";
+            modalModelMessage.Body = "The item has not been deleted from the invoice";
+            modalModelMessage.isVisible = true;
+            StateHasChanged();
+
+        }
+        else
+        {
+            await _invItemService.DeleteInvoiceItemByIdAsync((int)modalModelMessage.idToDelte);
+            modalModelMessage.idToDelte = null;
+            modalModelMessage.Type = ModalType.Success;
+            modalModelMessage.Title = "Success";
+            modalModelMessage.Body = "The item has been successfully deleted from the invoice";
+            modalModelMessage.isVisible = true;
+            invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
+            StateHasChanged();
+        }
 
     }
     private void showItemsModal()
@@ -205,7 +256,7 @@
     }
     private void onCancel(MouseEventArgs e)
     {
-        modalModel = new();
+        modalModelMessage = new();
         StateHasChanged();
 
     }

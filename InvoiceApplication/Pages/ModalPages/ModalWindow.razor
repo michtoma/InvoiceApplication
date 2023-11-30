@@ -6,23 +6,52 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content rounded-3 shadow">
                 <div class="modal-body p-4 text-center">
-                    <h5 class="mb-0">@modalMessage.Title</h5>
+                    @if (modalMessage.Type == ModalType.Success)
+                    {
+                        <h5 class="mb-0 text-success">@modalMessage.Title</h5>
+
+                    }
+                    else if (modalMessage.Type == ModalType.Error)
+                    {
+                        <h5 class="mb-0 text-danger">@modalMessage.Title</h5>
+
+                    }
+                    else if (modalMessage.Type == ModalType.Danger)
+                    {
+                        <h5 class="mb-0 text-danger">@modalMessage.Title</h5>
+
+                    }
+                    else
+                    {
+                        <h5 class="mb-0">@modalMessage.Title</h5>
+                    }
+
                     <p class="mb-0">@modalMessage.Body</p>
                 </div>
                 @if (modalMessage.Type == ModalType.Confirm)
                 {
-                <div class="modal-footer flex-nowrap p-0">
-                    <button type="button" class="btn btn-success rounded-0 border-end" @onclick="onConfirm"><strong>Yes, confirm</strong></button>
-                    <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">No thanks</button>
+                    <div class="modal-footer flex-nowrap p-0">
+                        <button type="button" class="btn btn-success rounded-0 border-end" @onclick="onConfirm"><strong>Yes, confirm</strong></button>
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">No thanks</button>
                     </div>
+                }
+                else if (modalMessage.Type == ModalType.Danger)
+                {
+                    <div class="modal-footer flex-nowrap p-0">
+                        <button type="button" class="btn btn-success rounded-0 border-end" @onclick="onConfirmDelete"><strong>Yes, confirm</strong></button>
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">No thanks</button>
+                    </div>
+
                 }
                 else
                 {
-                <div class="modal-footer flex-nowrap p-0">
-                    <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">Close</button>
-                </div>
-                    
+
+                    <div class="modal-footer flex-nowrap p-0">
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">Close</button>
+                    </div>
                 }
+
+
             </div>
         </div>
     </div>
@@ -33,9 +62,15 @@
     [Parameter]
     public ModalMessage modalMessage { get; set; }
     [Parameter]
+    public bool? forDelete { get; set; }
+    [Parameter]
     public EventCallback<MouseEventArgs> onConfirm { get; set; }
     [Parameter]
     public EventCallback<MouseEventArgs> onCancel { get; set; }
-
+    private async void onConfirmDelete()
+    {
+        forDelete = true;
+        await onConfirm.InvokeAsync();
+    }
 
 }

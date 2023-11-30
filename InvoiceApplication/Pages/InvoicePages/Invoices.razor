@@ -4,33 +4,24 @@
 <PageTitle>Invoice List</PageTitle>
 <h3>Invoice List</h3>
 <a class="btn btn-outline-primary" href="invoiceAction">Add New</a>
-@if (isVisible)
-{
-
-    <NewInvoice></NewInvoice>
-}
 @if (invoices == null)
 {
     <p>Loading .... </p>
 }
-else if (invoices.Count() == 0)
-{
-    <p><span class="oi oi-compass"></span> Nothing to show :(((</p>
-}
 else
 {
-    <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationState">
+    <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationState" ResizableColumns="true">
 
         <PropertyColumn Property="@(i=>i.Number)" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(i=>i.DateOfIssue)" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(i=>i.PaymentDate)" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(i=>i.DateOfIssue)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(i=>i.PaymentDate)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
         <PropertyColumn Property="@(i=>i.IsPaid)" Sortable="true"></PropertyColumn>
         <TemplateColumn Title="Action Buttons">
             <button class="btn btn-danger" @onclick="(d=> ShowInvoiceDetails(context.Id))">View</button>
             <button class="btn btn-dark" @onclick="(e=> EditInvoice(context.Id))">Edit</button>
-            <button class="btn btn-primary">Duplicate</button>
             @if (context.IsEditable)
             {
                 <button class="btn btn-danger" @onclick="(d=> DeleteInvoice(context.Id))" >Delete</button>
