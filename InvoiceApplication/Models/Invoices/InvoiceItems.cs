@@ -11,6 +11,7 @@ namespace InvoiceApplication.Models.Invoices
         public int ItemId { get; set; }
         public Invoice? Invoice { get; set; }
         public int InvoiceId { get; set; }
+        public string Description { get; set; } = string.Empty;
         public double Quantity { get; set; }
         [Required(ErrorMessage = "Price is required")]
         public double NetPrice { get; set; } = 0;

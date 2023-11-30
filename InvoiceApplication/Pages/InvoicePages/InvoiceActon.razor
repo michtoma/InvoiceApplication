@@ -5,9 +5,10 @@
 @inject IItemService _itemService
 @inject IInvoiceItemService _invItemService
 <PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
-<ModalWindow modalMessage="modalModel" onCancel="onCancel" onConfirm="onConfirm"></ModalWindow>
-<ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
-<h3>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
+    <ModalWindow modalMessage="modalModel" onCancel="onCancel" onConfirm="onConfirm"></ModalWindow>
+    <ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
+    <ModalItemsInvoiceEdit @ref="modalInvItemEdit" OnClickClose="CloseEditInvoiceItem"></ModalItemsInvoiceEdit>
+    <h3>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
 <EditForm Model="invoice" OnValidSubmit="HeaderConirmation">
     <DataAnnotationsValidator />
     <div class="row">
@@ -41,53 +42,57 @@
         <InputText id="description" @bind-Value="invoice.Description" class="form-control"></InputText>
         <ValidationMessage For=@(()=>invoice.Description) />
     </div>
-    <button class="btn btn-success my-2" type="submit">@((invoiceId == null || invoiceId == 0) ? "Save Invoice" : "Update Invoice")</button>
+    <button class="btn btn-success my-2" type="submit">@((invoiceId == null || invoiceId == 0) ? "Save Invoice" : "Update Invoice Header")</button>
 </EditForm>
-    <div>
-        <table class="table table-striped">
-            <thead>
+<div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Item Name</th>
+                <th>Unit</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total Net Value</th>
+                <th>VAT Rate</th>
+                <th>Total Gross Value</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
+            {
                 <tr>
-                    <th>No</th>
-                    <th>Item Name</th>
-                    <th>Unit</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total Net Value</th>
-                    <th>VAT Rate</th>
-                    <th>Total Gross Value</th>
-                    <th>Action</th>
+                    <td>@(index + 1)</td>
+                    <td>@item.Item.Name</td>
+                    <td>@item.Item.UnitOfMeasure.ShortName</td>
+                    <td>@item.NetPrice.ToString("0.00")</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.TotalNetValue.ToString("0.00")</td>
+                    <td>@item.VatRate</td>
+                    <td>@item.TotalGrossValue.ToString("0.00")</td>
+                    <td><button class="btn btn-dark" @onclick="(i=> EditInvoiceItem(item.Id))">Edit</button> | <button class="btn btn-danger" @onclick="(i=> DeleteInvoiceItem(item.Id))">Delete</button></td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
-                {
-                    <tr>
-                        <td>@(index + 1)</td>
-                        <td>@item.Item.Name</td>
-                        <td>@item.Item.UnitOfMeasure.ShortName</td>
-                        <td>@item.NetPrice.ToString("0.00")</td>
-                        <td>@item.Quantity</td>
-                        <td>@item.TotalNetValue.ToString("0.00")</td>
-                        <td>@item.VatRate</td>
-                        <td>@item.TotalGrossValue.ToString("0.00")</td>
-                        <td><button class="btn btn-dark" @onclick="(i=> EditInvoiceItem(item.Id))">Edit</button> | <button class="btn btn-danger" @onclick="(i=> DeleteInvoiceItem(item.Id))">Delete</button></td>
-                    </tr>
-                }
-                <tr>
-                    <td colspan="4"></td>
-                    <th>Total:</th>
-                    <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
-                    <td>XXX</td>
-                    <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-@if (!(invoiceId == null || invoiceId == 0))
-{
-    <button class="btn btn-outline-secondary" @onclick="showItemsModal">Add Item to Invoice </button>
-}
-<a class="btn btn-secondary my-2" href=" Invoices">Back to Invoice List </a>
+            }
+            <tr>
+                <td colspan="4"></td>
+                <th>Total:</th>
+                <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
+                <td>XXX</td>
+                <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div>
+
+    @if (!(invoiceId == null || invoiceId == 0))
+    {
+        <button class="btn btn-outline-secondary me-2" @onclick="showItemsModal">Add Item to Invoice </button>
+    }
+    <a class="btn btn-secondary my-2" href=" Invoices">Back to Invoice List </a>
+</div>
 @code {
     bool modalConfirmed = false;
     [Parameter]
@@ -95,6 +100,7 @@
     ModalMessage modalModel = new();
     Invoice invoice = new();
     List<Item> items = new();
+    ModalItemsInvoiceEdit modalInvItemEdit;
     bool isVisibleItemsModal = false;
     protected override async Task OnInitializedAsync()
     {
@@ -167,9 +173,16 @@
         StateHasChanged();
 
     }
-    private void EditInvoiceItem(int invoiceItemId)
+    private async void EditInvoiceItem(int invoiceItemId)
     {
-
+        modalInvItemEdit.item = await _invItemService.GetInvoiceItemByIdAsync(invoiceItemId);
+        modalInvItemEdit.isVisible = true;
+        StateHasChanged();
+    }
+    private async void CloseEditInvoiceItem()
+    {
+        modalInvItemEdit.isVisible = false;
+        StateHasChanged();
     }
     private async void DeleteInvoiceItem(int invoiceItemId)
     {
