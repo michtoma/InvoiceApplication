@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="Models\RelationsTabels\" />
     <Folder Include="wwwroot\css\NewFolder\" />
   </ItemGroup>
 

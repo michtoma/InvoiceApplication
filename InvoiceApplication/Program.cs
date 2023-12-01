@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using InvoiceApplication.Data;
 using InvoiceApplication.Services.Items;
 using InvoiceApplication.Services.Invoices;
+using InvoiceApplication.Services.Companies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +17,8 @@ builder.Services.AddScoped<IVatRateService,VatRateService>();
 builder.Services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IInvoiceItemService, InvoiceItemService>();
+builder.Services.AddScoped<IBuyerService, BuyerService>();
+builder.Services.AddScoped<ISellerService, SellerService>();
 
 var app = builder.Build();
 

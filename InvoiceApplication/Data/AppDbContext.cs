@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using InvoiceApplication.Models.Items;
 using InvoiceApplication.Models.Invoices;
+using InvoiceApplication.Models.Companies;
 
 namespace InvoiceApplication.Data
 {
@@ -20,5 +21,8 @@ namespace InvoiceApplication.Data
         public DbSet<UnitOfMeasure> UnitOfMeasure { get; set; }
         public DbSet<InvoiceItems> InvoiceItems { get; set; }
         public DbSet<Invoice> Invoice { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Buyer> Buyers { get; set; }
+        public DbSet<Seller> Sellers { get; set; }
     }
 }

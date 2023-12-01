@@ -1,9 +1,10 @@
 ﻿@page "/invoiceAction"
 @page "/invoiceAction/{invoiceId:int?}"
-@using InvoiceApplication.Pages.ModalPages
 @inject IInvoiceService _invoiceService
 @inject IItemService _itemService
 @inject IInvoiceItemService _invItemService
+@inject IBuyerService _buyerService
+@inject ISellerService _sellerService
 <PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
     <ModalWindow modalMessage="modalModelMessage" onCancel="onCancel" onConfirm="onConfirm" forDelete="toDelete"></ModalWindow>
     <ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
@@ -13,22 +14,45 @@
     <DataAnnotationsValidator />
     <div class="row">
 
-        <div class="col-3">
+        <div class="col-6">
+            <label for="seller">Seller</label>
+            <InputSelect id="seller" @bind-Value="invoice.SellerId" class="form-control">
+                @foreach (var seller in sellers)
+                {
+                    <option value="@seller.Id">@seller.Name @seller.Nip</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col-6">
+            <label for="buyer">Buyer</label>
+            <InputSelect id="buyer" @bind-Value="invoice.BuyerId" class="form-control">
+                @foreach (var buyer in buyers)
+                {
+                    <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col-6">
+            <label for="buyer">Buyer</label>
+            <InputNumber id="number" @bind-Value="invoice.BuyerId" class="form-control"></InputNumber>
+            <ValidationMessage For="@(() => invoice.BuyerId)" />
+        </div>
+        <div class="col-2">
             <label for="number">Number</label>
             <InputText id="number" @bind-Value="invoice.Number" class="form-control"></InputText>
             <ValidationMessage For="@(() => invoice.Number)" />
         </div>
-        <div class="col-3">
+        <div class="col-2">
             <label for="createDate">Create Date</label>
             <InputDate id="createDate" @bind-Value="invoice.CreateDate" class="form-control"></InputDate>
             <ValidationMessage For=@(()=>invoice.CreateDate) />
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <label for="issueDate">Issue Date</label>
             <InputDate id="createDate" @bind-Value="invoice.DateOfIssue" class="form-control"></InputDate>
             <ValidationMessage For=@(()=>invoice.DateOfIssue) />
         </div>
-        <div class="col-3">
+        <div class="col-1">
             <label for="days">Payment term</label>
             <InputNumber id="days" @bind-Value="invoice.DaysOfPaiment" class="form-control"></InputNumber>
             <ValidationMessage For=@(()=>invoice.DaysOfPaiment) />
@@ -64,10 +88,14 @@
             {
                 <tr>
                     <td>@(index + 1)</td>
-                    <td>@item.Item.Name @if (item.Description != "")
+                    <td>
+                        @item.Item.Name @if (item.Description != "")
                         {
-                            <br /> 
-                            @item.Description
+                            <br />
+                            <textarea readonly class="flex-column">
+
+                                @item.Description
+                                    </textarea>
                         }
                     </td>
                     <td>@item.Item.UnitOfMeasure.ShortName</td>
@@ -106,11 +134,15 @@
     ModalMessage modalModelMessage = new();
     Invoice invoice = new();
     List<Item> items = new();
+    List<Seller> sellers = new();
+    List<Buyer> buyers = new();
     ModalItemsInvoiceEdit modalInvItemEdit;
     bool isVisibleItemsModal = false;
     protected override async Task OnInitializedAsync()
     {
         items = await _itemService.GetAllItemsAsync();
+        buyers = await _buyerService.GetAllBuyersAsync();
+        sellers = await _sellerService.GetAllSellersAsync();
         if (!(invoiceId == 0 || invoiceId == null))
         {
             invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);

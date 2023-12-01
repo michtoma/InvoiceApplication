@@ -1,0 +1,48 @@
+﻿@inject ISellerService _service
+@page "/NewSeller"
+
+<h3>NewSeller</h3>
+<EditForm Model="seller" OnValidSubmit="SubmitForm">
+    <DataAnnotationsValidator />
+    <div class="row">
+        <div style="display: none;">
+            <label for="id">Id</label>
+            <InputNumber id="id" @bind-Value="seller.Id" class="form-control"></InputNumber>
+            <ValidationMessage For="@(() => seller.Id)" />
+        </div>
+        <div class="col-4">
+            <label for="Nip">Nip</label>
+            <InputText id="Nip" @bind-Value="seller.Nip" class="form-control"></InputText>
+            <ValidationMessage For="@(() => seller.Nip)" />
+        </div>
+        <div class="col-8">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="seller.Name" class="form-control"></InputText>
+            <ValidationMessage For="@(() => seller.Name)" />
+        </div>
+    </div>
+    <div>
+        <label for="Phone">Phone</label>
+        <InputText id="Phone" @bind-Value="seller.Phone" class="form-control"></InputText>
+        <ValidationMessage For="@(() => seller.Phone)" />
+    </div>
+    <div>
+        <label for="Email">Email</label>
+        <InputText id="Email" @bind-Value="seller.Email" class="form-control"></InputText>
+        <ValidationMessage For="@(() => seller.Email)" />
+    </div>
+    <div class="m-3">
+        <button type="submit" class="btn btn-primary">Create seller</button>
+        @* <button class="btn btn-dark" @onclick="Close">Close</button> *@
+    </div>
+</EditForm>
+
+@code {
+    Seller seller = new();
+    private async void SubmitForm()
+    {
+        await _service.CreateSellerAsync(seller);
+        StateHasChanged();
+    }
+
+}

@@ -1,11 +1,17 @@
-﻿namespace InvoiceApplication.Models.Invoices
+﻿using InvoiceApplication.Models.Companies;
+
+namespace InvoiceApplication.Models.Invoices
 {
     public class Invoice
     {
         public int Id { get; set; }
-        public string Number { get; set; }
+        public string Number { get; set; } = string.Empty;
         public DateTime CreateDate { get; set; } = DateTime.Now;
         public DateTime DateOfIssue { get; set; } = DateTime.Now;
+        public Buyer? Buyer { get; set; }
+        public int? BuyerId { get; set; }
+        public Seller? Seller { get; set; }
+        public int? SellerId { get; set; }
         public int DaysOfPaiment { get; set; }
         public DateTime PaymentDate
         {
