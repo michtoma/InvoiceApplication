@@ -33,6 +33,11 @@ namespace InvoiceApplication.Services.Companies
             }
         }
 
+        public async Task<List<Address>> GetAddressByCompanyIdAsync(int companyId)
+        {
+            return await _context.Addresses.Where(a=>a.CompanyId == companyId).ToListAsync();
+        }
+
         public async Task<Address> GetAddressByIdAsync(int addressId)
         {
             try
@@ -63,7 +68,7 @@ namespace InvoiceApplication.Services.Companies
                     existingAddress.Street = address.Street;
                     existingAddress.City = address.City;
                     existingAddress.PostalCode = address.PostalCode;
-                    existingAddress.Companies = address.Companies;
+                    existingAddress.CompanyId = address.CompanyId;
                     existingAddress.Country = address.Country;
                     existingAddress.IsActive = address.IsActive;
                     await _context.SaveChangesAsync();

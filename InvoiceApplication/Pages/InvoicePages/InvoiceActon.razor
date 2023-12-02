@@ -5,6 +5,7 @@
 @inject IInvoiceItemService _invItemService
 @inject IBuyerService _buyerService
 @inject ISellerService _sellerService
+@inject IAddresService _addressService
 <PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
     <ModalWindow modalMessage="modalModelMessage" onCancel="onCancel" onConfirm="onConfirm" forDelete="toDelete"></ModalWindow>
     <ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
@@ -16,28 +17,47 @@
 
         <div class="col-6">
             <label for="seller">Seller</label>
-            <InputSelect id="seller" @bind-Value="invoice.SellerId" class="form-control">
+            <InputSelect id="seller" class="form-control my-1" ValueExpression="@(()=>invoice.SellerId)" Value="@invoice.SellerId" ValueChanged="@((int? args) => { invoice.SellerId = args; AddressSet(args); })">
+                <option value="" selected disabled>Select Company</option>
                 @foreach (var seller in sellers)
                 {
                     <option value="@seller.Id">@seller.Name @seller.Nip</option>
                 }
             </InputSelect>
+            <button class="btn btn-primary my-1">Add new Address</button>
+            <InputSelect id="sellerAddress" @bind-Value="invoice.SellerAddressId" class="form-control my-1">
+                <option value="" selected disabled>Select Company Address</option>
+                @foreach (var address in sellerAddresses)
+                {
+                    <option value="@address.Id">
+                        @address.City @address.Street
+                    </option>
+                }
+            </InputSelect>
+
         </div>
         <div class="col-6">
             <label for="buyer">Buyer</label>
-            <InputSelect id="buyer" @bind-Value="invoice.BuyerId" class="form-control">
+            <InputSelect id="buyer" class="form-control my-1" ValueExpression="@(()=>invoice.BuyerId)" Value="@invoice.BuyerId" ValueChanged="@((int? args) => { invoice.BuyerId = args; AddressSet(args); })">
+                <option value="" selected disabled>Select Company</option>
                 @foreach (var buyer in buyers)
                 {
                     <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
                 }
             </InputSelect>
+            <button class="btn btn-primary my-1">Add new Address</button>
+            <InputSelect id="buyerAddress" @bind-Value="invoice.BuyerAddressId" class="form-control my-1">
+                <option value="" selected disabled>Select Company Address</option>
+                @foreach (var address in buyerAddresses)
+                {
+                    <option value="@address.Id">
+                        @address.City @address.Street
+                    </option>
+                }
+            </InputSelect>
+
         </div>
-        <div class="col-6">
-            <label for="buyer">Buyer</label>
-            <InputNumber id="number" @bind-Value="invoice.BuyerId" class="form-control"></InputNumber>
-            <ValidationMessage For="@(() => invoice.BuyerId)" />
-        </div>
-        <div class="col-2">
+        <div class="col-4">
             <label for="number">Number</label>
             <InputText id="number" @bind-Value="invoice.Number" class="form-control"></InputText>
             <ValidationMessage For="@(() => invoice.Number)" />
@@ -95,7 +115,7 @@
                             <textarea readonly class="flex-column">
 
                                 @item.Description
-                                    </textarea>
+                                                            </textarea>
                         }
                     </td>
                     <td>@item.Item.UnitOfMeasure.ShortName</td>
@@ -133,9 +153,13 @@
     public int? invoiceId { get; set; }
     ModalMessage modalModelMessage = new();
     Invoice invoice = new();
+    Seller seller = new();
+    Buyer buyer = new();
     List<Item> items = new();
     List<Seller> sellers = new();
     List<Buyer> buyers = new();
+    List<Address> sellerAddresses = new();
+    List<Address> buyerAddresses = new();
     ModalItemsInvoiceEdit modalInvItemEdit;
     bool isVisibleItemsModal = false;
     protected override async Task OnInitializedAsync()
@@ -146,7 +170,19 @@
         if (!(invoiceId == 0 || invoiceId == null))
         {
             invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
+            buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
+            seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
         }
+    }
+    async void AddressSet(int? i)
+    {
+        sellerAddresses = new();
+        buyerAddresses = new();
+        if (invoice.SellerId is not null) sellerAddresses = await _addressService.GetAddressByCompanyIdAsync((int)invoice.SellerId);
+        if (invoice.BuyerId is not null) buyerAddresses = await _addressService.GetAddressByCompanyIdAsync((int)invoice.BuyerId);
+        if(invoice.SellerId is not null) seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+        if(invoice.BuyerId is not null) buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
+        StateHasChanged();
     }
     void HeaderConirmation()
     {

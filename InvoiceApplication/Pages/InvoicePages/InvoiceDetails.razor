@@ -9,94 +9,114 @@
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Number</th>
-                <td>@invoice.Number</td>
-            </tr>
-            <tr>
-                <th>Create Date</th>
-                <td>@invoice.CreateDate.ToShortDateString()</td>
-            </tr>
-            <tr>
-                <th>Issue Date</th>
-                <td>@invoice.DateOfIssue.ToShortDateString()</td>
-            </tr>
-            <tr>
-                <th>Payment term</th>
-                <td>@invoice.DaysOfPaiment</td>
-            </tr>
-            <tr>
-                <th>Payment date</th>
-                <td>@invoice.PaymentDate.ToShortDateString()</td>
-            </tr>
-        </thead>
-        <tbody>
-            @if (invoice.InvoiceItems.Any())
-            {
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-6">
+                    <div class="invoice-header-info">
+                        <div>@invoice.Seller.Name</div>
+                        <div>@invoice.SellerAddress.PostalCode @invoice.SellerAddress.City</div>
+                        <div>@invoice.SellerAddress.Street @invoice.SellerAddress.StreetNumber/@invoice.SellerAddress.ApartmentNumber</div>
+                        <div>Email: @invoice.Seller.Email</div>
+                        <div>Phone: @invoice.Seller.Phone</div>
+                    </div>
+                </div>
+                <div class="col-6 text-right">
+                    <div class="invoice-header-info">
+                        <div>@invoice.Buyer.Name</div>
+                        <div>@invoice.BuyerAddress.PostalCode @invoice.BuyerAddress.City</div>
+                        <div>@invoice.BuyerAddress.Street @invoice.BuyerAddress.StreetNumber/@invoice.BuyerAddress.ApartmentNumber</div>
+                        <div>Email: @invoice.Buyer.Email</div>
+                        <div>Phone: @invoice.Buyer.Phone</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped mt-4">
+            <thead>
                 <tr>
-                    <td colspan="8">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Item Name</th>
-                                    <th>Unit</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total Net Value</th>
-                                    <th>VAT Rate</th>
-                                    <th>Total Gross Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
-                                {
+                    <th>Number</th>
+                    <td>@invoice.Number</td>
+                </tr>
+                <tr>
+                    <th>Create Date</th>
+                    <td>@invoice.CreateDate.ToShortDateString()</td>
+                </tr>
+                <tr>
+                    <th>Issue Date</th>
+                    <td>@invoice.DateOfIssue.ToShortDateString()</td>
+                </tr>
+                <tr>
+                    <th>Payment date</th>
+                    <td>@invoice.PaymentDate.ToShortDateString()</td>
+                </tr>
+            </thead>
+            <tbody>
+                @if (invoice.InvoiceItems.Any())
+                {
+                    <tr>
+                        <td colspan="8">
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <td >@(index + 1)</td>
-                                        <td class ="col-5">
-                                            @item.Item.Name @if (item.Description != "")
-                                            {
-                                                <br />
-                                                @item.Description
-                                            }
-                                        </td>
-
-                                        <td>@item.Item.UnitOfMeasure.ShortName</td>
-                                        <td>@item.NetPrice.ToString("0.00")</td>
-                                        <td>@item.Quantity</td>
-                                        <td>@item.TotalNetValue.ToString("0.00")</td>
-                                        <td>@item.VatRate</td>
-                                        <td>@item.TotalGrossValue.ToString("0.00")</td>
+                                        <th>No</th>
+                                        <th>Item Name</th>
+                                        <th>Unit</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total Net Value</th>
+                                        <th>VAT Rate</th>
+                                        <th>Total Gross Value</th>
                                     </tr>
-                                }
-                                <tr>
-                                    <td colspan="4"></td>
-                                    <th>Total:</th>
-                                    <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
-                                    <td>XXX</td>
-                                    <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            }
-            else
-            {
-                <tr>
-                    <td colspan="8">
-                        <p>No items in the invoice.</p>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+                                </thead>
+                                <tbody>
+                                    @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
+                                    {
+                                        <tr>
+                                            <td>@(index + 1)</td>
+                                            <td class="col-5">
+                                                @item.Item.Name @if (item.Description != "")
+                                                {
+                                                    <br />
+                                                    @item.Description
+                                                }
+                                            </td>
 
-<button class="btn btn-secondary my-2" @onclick="BackToInvoiceList">Back to Invoice List</button>
+                                            <td>@item.Item.UnitOfMeasure.ShortName</td>
+                                            <td>@item.NetPrice.ToString("0.00")</td>
+                                            <td>@item.Quantity</td>
+                                            <td>@item.TotalNetValue.ToString("0.00")</td>
+                                            <td>@item.VatRate</td>
+                                            <td>@item.TotalGrossValue.ToString("0.00")</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td colspan="4"></td>
+                                        <th>Total:</th>
+                                        <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
+                                        <td>XXX</td>
+                                        <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">
+                            <p>No items in the invoice.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
+    <button class="btn btn-secondary my-2" @onclick="BackToInvoiceList">Back to Invoice List</button>
+    }
 
 @code {
     [Parameter]

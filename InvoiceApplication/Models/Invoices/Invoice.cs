@@ -12,6 +12,11 @@ namespace InvoiceApplication.Models.Invoices
         public int? BuyerId { get; set; }
         public Seller? Seller { get; set; }
         public int? SellerId { get; set; }
+        public Address? SellerAddress { get; set; }
+        public int? SellerAddressId { get; set; }
+        public Address? BuyerAddress { get; set; }
+        public int? BuyerAddressId { get; set; }
+
         public int DaysOfPaiment { get; set; }
         public DateTime PaymentDate
         {

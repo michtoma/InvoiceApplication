@@ -19,6 +19,7 @@ builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IInvoiceItemService, InvoiceItemService>();
 builder.Services.AddScoped<IBuyerService, BuyerService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
+builder.Services.AddScoped<IAddresService, AddresService>();
 
 var app = builder.Build();
 

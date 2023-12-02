@@ -72,6 +72,8 @@ namespace InvoiceApplication.Services.Invoices
                 oldInvoice.DaysOfPaiment = invoice.DaysOfPaiment;
                 oldInvoice.Description = invoice.Description;
                 oldInvoice.IsPaid = invoice.IsPaid;
+                oldInvoice.SellerAddressId = invoice.SellerAddressId;
+                oldInvoice.BuyerAddressId = invoice.BuyerAddressId;
                 _context.Update(oldInvoice);
                 await _context.SaveChangesAsync();
             }

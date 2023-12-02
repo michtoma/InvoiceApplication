@@ -4,6 +4,7 @@ using InvoiceApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvoiceApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231202153611_AddressChanged")]
+    partial class AddressChanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,10 +32,6 @@ namespace InvoiceApplication.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApartmentNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
                         .IsRequired()
@@ -53,10 +52,6 @@ namespace InvoiceApplication.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StreetNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -112,9 +107,6 @@ namespace InvoiceApplication.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BuyerAddressId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("BuyerId")
                         .HasColumnType("int");
 
@@ -141,19 +133,12 @@ namespace InvoiceApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SellerAddressId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("SellerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerAddressId");
-
                     b.HasIndex("BuyerId");
-
-                    b.HasIndex("SellerAddressId");
 
                     b.HasIndex("SellerId");
 
@@ -309,17 +294,9 @@ namespace InvoiceApplication.Migrations
 
             modelBuilder.Entity("InvoiceApplication.Models.Invoices.Invoice", b =>
                 {
-                    b.HasOne("InvoiceApplication.Models.Companies.Address", "BuyerAddress")
-                        .WithMany()
-                        .HasForeignKey("BuyerAddressId");
-
                     b.HasOne("InvoiceApplication.Models.Companies.Buyer", "Buyer")
                         .WithMany("Invoices")
                         .HasForeignKey("BuyerId");
-
-                    b.HasOne("InvoiceApplication.Models.Companies.Address", "SellerAddress")
-                        .WithMany()
-                        .HasForeignKey("SellerAddressId");
 
                     b.HasOne("InvoiceApplication.Models.Companies.Seller", "Seller")
                         .WithMany("Invoices")
@@ -327,11 +304,7 @@ namespace InvoiceApplication.Migrations
 
                     b.Navigation("Buyer");
 
-                    b.Navigation("BuyerAddress");
-
                     b.Navigation("Seller");
-
-                    b.Navigation("SellerAddress");
                 });
 
             modelBuilder.Entity("InvoiceApplication.Models.Invoices.InvoiceItems", b =>
