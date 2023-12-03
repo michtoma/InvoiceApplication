@@ -10,7 +10,7 @@ namespace InvoiceApplication.Models.Companies
         [MinLength(3)]
         public string Name { get; set; } = string.Empty;
         [Required]
-        [StringLength(9)]
+        [StringLength(10), MinLength(10)]
         public string Nip { get; set; } = string.Empty;
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; } = string.Empty;

@@ -3,8 +3,11 @@
 @inject NavigationManager _navigationManager
 @page "/NewBuyer"
 <PageTitle>New Buyer</PageTitle>
-<h3>New Buyer</h3>
+<AuthorizeView>
+    <Authorized>
+        <h3>New Buyer</h3>
 <EditForm Model="buyer" OnValidSubmit="SubmitForm">
+    <ChildContent Context="buyerContext">
     <DataAnnotationsValidator />
     <div class="row col-10">
         <div class="col-6">
@@ -74,8 +77,14 @@
             </div>
         </div>
     </div>
+    </ChildContent>
 </EditForm>
 
+    </Authorized>
+    <NotAuthorized>
+        <p role="status">You are not authorized to see this content</p>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
     Buyer buyer = new();
     Address address = new();

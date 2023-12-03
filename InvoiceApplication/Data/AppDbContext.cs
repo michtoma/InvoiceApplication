@@ -6,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using InvoiceApplication.Models.Items;
 using InvoiceApplication.Models.Invoices;
 using InvoiceApplication.Models.Companies;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace InvoiceApplication.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext
     {
-        public AppDbContext (DbContextOptions<AppDbContext> options)
+
+        public AppDbContext (DbContextOptions options)
             : base(options)
         {
         }
@@ -24,5 +26,9 @@ namespace InvoiceApplication.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Buyer> Buyers { get; set; }
         public DbSet<Seller> Sellers { get; set; }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }

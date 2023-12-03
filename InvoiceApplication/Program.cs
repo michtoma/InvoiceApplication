@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using InvoiceApplication.Data;
 using InvoiceApplication.Services.Items;
 using InvoiceApplication.Services.Invoices;
 using InvoiceApplication.Services.Companies;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,17 +11,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext") ?? throw new InvalidOperationException("Connection string 'AppDbContext' not found.")));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 5;
+    options.Password.RequireNonAlphanumeric = false;
+    options.SignIn.RequireConfirmedEmail = false;
+})
+    .AddEntityFrameworkStores<AppDbContext>();
+
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddScoped<IItemService,ItemService>();
-builder.Services.AddScoped<IVatRateService,VatRateService>();
+builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IVatRateService, VatRateService>();
 builder.Services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IInvoiceItemService, InvoiceItemService>();
 builder.Services.AddScoped<IBuyerService, BuyerService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<IAddresService, AddresService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +47,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

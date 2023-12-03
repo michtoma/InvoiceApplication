@@ -36,12 +36,16 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task<List<Invoice>> GetAllInvoiceAsync()
         {
-            return await _context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).ToListAsync();
+            return await _context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).
+                Include(i=>i.BuyerAddress).Include(i=>i.SellerAddress).
+                Include(i=>i.Seller).Include(i => i.Buyer).ToListAsync();
         }
 
         public async Task<Invoice> GetInvoiceByIdAsync(int id)
         {
-            var invoice = await _context.Invoice.Include(i => i.InvoiceItems).ThenInclude(i=>i.Item).ThenInclude(i=>i.UnitOfMeasure).FirstOrDefaultAsync(i=> i.Id == id);
+            var invoice = await _context.Invoice.Include(i => i.InvoiceItems).ThenInclude(i=>i.Item).ThenInclude(i=>i.UnitOfMeasure).
+                Include(i => i.BuyerAddress).Include(i => i.SellerAddress).
+                Include(i => i.Seller).Include(i => i.Buyer).FirstOrDefaultAsync(i=> i.Id == id);
 
             if (invoice != null)
             {
