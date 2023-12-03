@@ -6,21 +6,23 @@ namespace InvoiceApplication.Services.Companies
 {
     public class SellerService : ISellerService
     {
-        private readonly AppDbContext _context;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
-        public SellerService(AppDbContext context)
+        public SellerService(IDbContextFactory<AppDbContext> dbContextFactory)
         {
-            _context = context;
+            _dbContextFactory = dbContextFactory;
         }
 
         public async Task CreateSellerAsync(Seller seller)
         {
+            using var _context = _dbContextFactory.CreateDbContext();
             _context.Sellers.Add(seller);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteSellerAsync(int sellerId)
         {
+            using var _context = _dbContextFactory.CreateDbContext();
             try
             {
                 var SellerToDelete = await GetSellerByIdAsync(sellerId);
@@ -35,6 +37,7 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<Seller> GetSellerByIdAsync(int sellerId)
         {
+            using var _context = _dbContextFactory.CreateDbContext();
             try
             {
                 return await _context.Sellers.FindAsync(sellerId);
@@ -49,11 +52,13 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Seller>> GetAllSellersAsync()
         {
+            using var _context = _dbContextFactory.CreateDbContext();
             return await _context.Sellers.ToListAsync();
         }
 
         public async Task UpdateSellerAsync(Seller seller)
         {
+            using var _context = _dbContextFactory.CreateDbContext();
             try
             {
                 var existingSeller = await GetSellerByIdAsync(seller.Id);

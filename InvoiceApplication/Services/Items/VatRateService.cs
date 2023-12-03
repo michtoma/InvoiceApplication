@@ -1,21 +1,23 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Items;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace InvoiceApplication.Services.Items
 {
     public class VatRateService : IVatRateService
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
-        public VatRateService(AppDbContext dbContext)
+        public VatRateService(IDbContextFactory<AppDbContext> contextFactory)
         {
-            _dbContext = dbContext;
+            _contextFactory = contextFactory;
         }
 
         public async Task<List<VatRate>> GetVatRatesAsync()
         {
-            return await _dbContext.VatRate.ToListAsync();
+            using var _context = await _contextFactory.CreateDbContextAsync();
+            return await _context.VatRate.ToListAsync();
         }
     }
 }

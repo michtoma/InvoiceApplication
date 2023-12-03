@@ -1,20 +1,22 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Invoices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace InvoiceApplication.Services.Invoices
 {
     public class InvoiceService : IInvoiceService
     {
-        private readonly AppDbContext _context;
+        private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
-        public InvoiceService(AppDbContext context)
+        public InvoiceService(IDbContextFactory<AppDbContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         public async Task AddInvoiceAsync(Invoice invoice)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             var invoices = await GetAllInvoiceAsync();
             Invoice numberExist = invoices.FirstOrDefault(i => i.Number.ToLower() == invoice.Number.ToLower());
             if (numberExist != null)
@@ -30,12 +32,14 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task DeleteInvoiceAsync(Invoice invoice)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             _context.Invoice.Remove(invoice);
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<Invoice>> GetAllInvoiceAsync()
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             return await _context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).
                 Include(i=>i.BuyerAddress).Include(i=>i.SellerAddress).
                 Include(i=>i.Seller).Include(i => i.Buyer).ToListAsync();
@@ -43,6 +47,7 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task<Invoice> GetInvoiceByIdAsync(int id)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             var invoice = await _context.Invoice.Include(i => i.InvoiceItems).ThenInclude(i=>i.Item).ThenInclude(i=>i.UnitOfMeasure).
                 Include(i => i.BuyerAddress).Include(i => i.SellerAddress).
                 Include(i => i.Seller).Include(i => i.Buyer).FirstOrDefaultAsync(i=> i.Id == id);
@@ -60,12 +65,14 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task<bool> InvoiceExist(int invoiceId)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             var invoice = await _context.Invoice.FindAsync(invoiceId);
             return invoice != null;
         }
 
         public async Task UpdateInvoiceAsync(Invoice invoice)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             var oldInvoice = _context.Invoice.Find(invoice.Id);
             if (oldInvoice != null)
             {

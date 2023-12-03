@@ -1,26 +1,29 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Companies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace InvoiceApplication.Services.Companies
 {
     public class AddresService : IAddresService
     {
-        private readonly AppDbContext _context;
+        private readonly IDbContextFactory<AppDbContext> _contextFactoy;
 
-        public AddresService(AppDbContext context)
+        public AddresService(IDbContextFactory<AppDbContext> contextFactoy)
         {
-            _context = context;
+            _contextFactoy = contextFactoy;
         }
 
         public async Task CreateAddressAsync(Address address)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             _context.Addresses.Add(address);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAddressAsync(int addressId)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             try
             {
                 var addressToDelete = await GetAddressByIdAsync(addressId);
@@ -35,11 +38,13 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Address>> GetAddressByCompanyIdAsync(int companyId)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             return await _context.Addresses.Where(a=>a.CompanyId == companyId).ToListAsync();
         }
 
         public async Task<Address> GetAddressByIdAsync(int addressId)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             try
             {
                 return await _context.Addresses.FindAsync(addressId);
@@ -54,11 +59,13 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Address>> GetAllAddressesAsync()
         {
+            using var _context = _contextFactoy.CreateDbContext();
             return await _context.Addresses.ToListAsync();
         }
 
         public async Task UpdateAddressAsync(Address address)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             try
             {
                 var existingAddress = await GetAddressByIdAsync(address.Id);

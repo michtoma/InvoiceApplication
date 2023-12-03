@@ -6,15 +6,17 @@ namespace InvoiceApplication.Services.Invoices
 {
     public class InvoiceItemService : IInvoiceItemService
     {
-        private readonly AppDbContext _context;
+        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        
 
-        public InvoiceItemService(AppDbContext context)
+        public InvoiceItemService(IDbContextFactory<AppDbContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         public async Task AddInvoiceItemAsync(InvoiceItems invoiceItem)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             try
             {
                 await _context.AddAsync(invoiceItem);
@@ -28,6 +30,7 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task DeleteInvoiceItemByIdAsync(int invoicesItemId)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             var invoiceItemToDelete = await GetInvoiceItemByIdAsync(invoicesItemId);
             try
             {
@@ -43,11 +46,13 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task<List<InvoiceItems>> GetAllInvoiceItemsAsync()
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             return await _context.InvoiceItems.Include(i => i.Item).ToListAsync();
         }
 
         public async Task<InvoiceItems> GetInvoiceItemByIdAsync(int invoiceItemId)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             try
             {
                 return await _context.InvoiceItems.FindAsync(invoiceItemId);
@@ -61,6 +66,7 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task UpdateInvoiceItemAsync(InvoiceItems invoiceItem)
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             try
             {
                 var existingInvoiceItem = await _context.InvoiceItems.FindAsync(invoiceItem.Id);

@@ -6,21 +6,23 @@ namespace InvoiceApplication.Services.Companies
 {
     public class BuyerService : IBuyerService
     {
-        private readonly AppDbContext _context;
+        private readonly IDbContextFactory<AppDbContext> _contextFactoy;
 
-        public BuyerService(AppDbContext context)
+        public BuyerService(IDbContextFactory<AppDbContext> contextFactoy)
         {
-            _context = context;
+            _contextFactoy = contextFactoy;
         }
 
         public async Task CreateBuyerAsync(Buyer buyer)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             _context.Buyers.Add(buyer);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteBuyerAsync(int buyerId)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             try
             {
                 var BuyerToDelete = await GetBuyerByIdAsync(buyerId);
@@ -35,6 +37,7 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<Buyer> GetBuyerByIdAsync(int buyerId)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             try
             {
                 return await _context.Buyers.FindAsync(buyerId);
@@ -49,11 +52,13 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Buyer>> GetAllBuyersAsync()
         {
+            using var _context = _contextFactoy.CreateDbContext();
             return await _context.Buyers.ToListAsync();
         }
 
         public async Task UpdateBuyerAsync(Buyer buyer)
         {
+            using var _context = _contextFactoy.CreateDbContext();
             try
             {
                 var existingBuyer = await GetBuyerByIdAsync(buyer.Id);

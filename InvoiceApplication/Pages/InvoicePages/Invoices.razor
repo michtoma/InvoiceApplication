@@ -35,10 +35,10 @@ else
     bool isVisible = false;
     private List<Invoice> invoices = new();
     PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     invoices = await _invoiceService.GetAllInvoiceAsync();
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        invoices = await _invoiceService.GetAllInvoiceAsync();
+    }
     private void EditInvoice(int InvoiceId)
     {
         navigationManager.NavigateTo($"invoiceAction/{InvoiceId}");
