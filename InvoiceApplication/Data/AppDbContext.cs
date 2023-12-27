@@ -26,6 +26,7 @@ namespace InvoiceApplication.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Buyer> Buyers { get; set; }
         public DbSet<Seller> Sellers { get; set; }
+        public DbSet<AppUser> AppUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

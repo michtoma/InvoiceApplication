@@ -1,4 +1,4 @@
-﻿@page "/register"
+﻿@page "/identity/register"
 @model InvoiceApplication.Areas.Identity.Pages.Account.RegisterModel
 @{
     ViewData["Title"] = "Log in";
@@ -12,6 +12,16 @@
                 <h2>Register a new user</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating" style="margin:10px">
+                    <input asp-for="Input.FirstName" class="form-control" autocomplete="firstName" aria-required="true" />
+                    <label asp-for="Input.FirstName" class="form-label"></label>
+                    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-floating" style="margin:10px">
+                    <input asp-for="Input.LastName" class="form-control" autocomplete="lastName" aria-required="true" />
+                    <label asp-for="Input.LastName" class="form-label"></label>
+                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                </div>
                 <div class="form-floating" style="margin:10px">
                     <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
                     <label asp-for="Input.Email" class="form-label"></label>

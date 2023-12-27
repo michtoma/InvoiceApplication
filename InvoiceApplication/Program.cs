@@ -4,17 +4,18 @@ using InvoiceApplication.Services.Items;
 using InvoiceApplication.Services.Invoices;
 using InvoiceApplication.Services.Companies;
 using Microsoft.AspNetCore.Identity;
+using InvoiceApplication.Models.Companies;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var connectionString = builder.Configuration.GetConnectionString("AppDbContext2");
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddDbContextFactory<AppDbContext>(option => 
-    option.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext") ?? throw new InvalidOperationException("Connection string 'AppDbContext' not found.")));
+    option.UseSqlServer(connectionString ?? throw new InvalidOperationException("Connection string 'AppDbContext' not found.")));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AppDbContext") ?? throw new InvalidOperationException("Connection string 'AppDbContext' not found.")));
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    options.UseSqlServer(connectionString ?? throw new InvalidOperationException("Connection string 'AppDbContext' not found.")));
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;

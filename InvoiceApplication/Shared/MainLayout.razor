@@ -1,19 +1,38 @@
 ﻿@inherits LayoutComponentBase
-
 <PageTitle>InvoiceApplication</PageTitle>
 
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="top-row px-4">
+                    <a target="_blank">@context.User.Identity.Name</a>
+                    <a href="/identity/logout" target="_blank">Logout</a>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="top-row px-4">
+                    <a class="btn btn-outline-primary" href="/identity/login">Login</a>
+                    <a class="btn btn-outline-primary" href="/identity/Register">Register</a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
 
         <article class="content px-4">
-            @Body
+            <AuthorizeView>
+                <Authorized>
+                    @Body
+                </Authorized>
+                <NotAuthorized>
+                    <p>Nothing to show, please Login or Register new account</p>
+                    <a class="btn btn-outline-primary" href="/identity/login">Login</a>
+                    <a class="btn btn-outline-primary" href="/identity/Register">Register</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </article>
     </main>
 </div>

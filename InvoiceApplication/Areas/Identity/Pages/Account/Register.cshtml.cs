@@ -1,3 +1,4 @@
+using InvoiceApplication.Models.Companies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,9 +8,9 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        public RegisterModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
+        public RegisterModel(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -27,7 +28,7 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
             ReturnUrl = Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var identity = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var identity = new AppUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName };
                 var result = await _userManager.CreateAsync(identity, Input.Password);
                 if (result.Succeeded)
                 {
@@ -42,11 +43,19 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
+            [DataType(DataType.EmailAddress)]
             public string Email { get; set; }
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; }
+            [Required]
+            [MinLength(4)]
+            [Display(Name ="First Name")]
+            public string FirstName { get; set; }
+            [Required]
+            [MinLength(4)]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
         }
     }
 }

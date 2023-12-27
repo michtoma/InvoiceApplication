@@ -1,4 +1,5 @@
 using InvoiceApplication.Data;
+using InvoiceApplication.Models.Companies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,9 +9,9 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, AppDbContext context)
+        public LoginModel(SignInManager<AppUser> signInManager, AppDbContext context)
         {
             _signInManager = signInManager;
         }
@@ -39,7 +40,7 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
+            [DataType(DataType.EmailAddress)]
             public string Email { get; set; }
             [Required]
             [DataType(DataType.Password)]

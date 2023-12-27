@@ -1,5 +1,8 @@
 ﻿using InvoiceApplication.Data;
+using InvoiceApplication.Models.Companies;
 using InvoiceApplication.Models.Invoices;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -8,6 +11,7 @@ namespace InvoiceApplication.Services.Invoices
     public class InvoiceService : IInvoiceService
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        
 
         public InvoiceService(IDbContextFactory<AppDbContext> contextFactory)
         {
@@ -18,6 +22,8 @@ namespace InvoiceApplication.Services.Invoices
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
             var invoices = await GetAllInvoiceAsync();
+            
+            
             Invoice numberExist = invoices.FirstOrDefault(i => i.Number.ToLower() == invoice.Number.ToLower());
             if (numberExist != null)
             {
@@ -25,6 +31,7 @@ namespace InvoiceApplication.Services.Invoices
             }
             else
             {
+               
                 await _context.AddAsync(invoice);
                 await _context.SaveChangesAsync();
             }

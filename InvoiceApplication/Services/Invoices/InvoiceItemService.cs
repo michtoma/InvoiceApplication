@@ -55,7 +55,7 @@ namespace InvoiceApplication.Services.Invoices
             using var _context = await _contextFactory.CreateDbContextAsync();
             try
             {
-                return await _context.InvoiceItems.FindAsync(invoiceItemId);
+                return await _context.InvoiceItems.Include(i=>i.Item).FirstOrDefaultAsync(i=>i.Id==invoiceItemId);
             }
             catch (Exception ex)
             {

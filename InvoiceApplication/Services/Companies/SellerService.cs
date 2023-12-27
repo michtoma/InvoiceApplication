@@ -65,7 +65,7 @@ namespace InvoiceApplication.Services.Companies
 
                 if (existingSeller != null)
                 {
-                    existingSeller.Addresses = seller.Addresses;
+                    existingSeller.AddressId = seller.AddressId;
                     existingSeller.Nip = seller.Nip;
                     existingSeller.Invoices = seller.Invoices;
                     existingSeller.Email = seller.Email;

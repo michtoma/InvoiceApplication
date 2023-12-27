@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 namespace InvoiceApplication.Models.Companies
@@ -19,7 +20,8 @@ namespace InvoiceApplication.Models.Companies
         [Required]
         public string Country { get; set; } = "Polska";
         public Company? Company { get; set; }
-        public int? CompanyId { get; set; }
+        [ForeignKey(nameof(Company))]
+        public int CompanyId { get; set; }
         public bool IsActive { get; set; } = true;
 
     }

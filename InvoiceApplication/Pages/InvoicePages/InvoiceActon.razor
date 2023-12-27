@@ -115,7 +115,7 @@
                             <textarea readonly class="flex-column">
 
                                 @item.Description
-                                                            </textarea>
+                                                                    </textarea>
                         }
                     </td>
                     <td>@item.Item.UnitOfMeasure.ShortName</td>
@@ -180,8 +180,8 @@
         buyerAddresses = new();
         if (invoice.SellerId is not null) sellerAddresses = await _addressService.GetAddressByCompanyIdAsync((int)invoice.SellerId);
         if (invoice.BuyerId is not null) buyerAddresses = await _addressService.GetAddressByCompanyIdAsync((int)invoice.BuyerId);
-        if(invoice.SellerId is not null) seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
-        if(invoice.BuyerId is not null) buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
+        if (invoice.SellerId is not null) seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+        if (invoice.BuyerId is not null) buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
         StateHasChanged();
     }
     void HeaderConirmation()
@@ -259,6 +259,7 @@
     {
         modalInvItemEdit.item = await _invItemService.GetInvoiceItemByIdAsync(invoiceItemId);
         modalInvItemEdit.isVisible = true;
+        modalInvItemEdit.wasEdited = false;
         StateHasChanged();
     }
     private async void CloseEditInvoiceItem()
@@ -266,11 +267,12 @@
         if (modalInvItemEdit.wasEdited)
         {
             modalInvItemEdit.isVisible = false;
-            StateHasChanged();
             modalModelMessage.Body = "The invoice item has been updated";
             modalModelMessage.Title = "Success";
             modalModelMessage.Type = ModalType.Success;
             modalModelMessage.isVisible = true;
+            StateHasChanged();
+            await OnInitializedAsync();
 
         }
         else
@@ -322,7 +324,7 @@
     {
         isVisibleItemsModal = false;
     }
-    private void onCancel(MouseEventArgs e)
+    private async void onCancel(MouseEventArgs e)
     {
         modalModelMessage = new();
         StateHasChanged();

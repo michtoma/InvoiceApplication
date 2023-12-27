@@ -1,4 +1,5 @@
 ﻿using InvoiceApplication.Models.Companies;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoiceApplication.Models.Invoices
 {
@@ -16,7 +17,7 @@ namespace InvoiceApplication.Models.Invoices
         public int? SellerAddressId { get; set; }
         public Address? BuyerAddress { get; set; }
         public int? BuyerAddressId { get; set; }
-
+        public string AppUserId { get; set; }
         public int DaysOfPaiment { get; set; }
         public DateTime PaymentDate
         {

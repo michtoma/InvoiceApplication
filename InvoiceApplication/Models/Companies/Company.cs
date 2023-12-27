@@ -1,5 +1,6 @@
 ﻿using InvoiceApplication.Models.Invoices;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoiceApplication.Models.Companies
 {
@@ -16,7 +17,9 @@ namespace InvoiceApplication.Models.Companies
         public string Email { get; set; } = string.Empty;
         [DataType(DataType.PhoneNumber)]
         public string Phone { get; set; } = string.Empty;
-        public IEnumerable<Address> Addresses { get; set; } = new List<Address>();
+        public Address? Address { get; set; }
+        public int? AddressId { get; set; }
+        public List<AppUser> Users { get; set; } = new List<AppUser>();
 
     }
 }
