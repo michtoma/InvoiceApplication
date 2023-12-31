@@ -40,7 +40,7 @@ namespace InvoiceApplication.Services.Companies
             using var _context = _contextFactoy.CreateDbContext();
             try
             {
-                return await _context.Buyers.FindAsync(buyerId);
+                return await _context.Buyers.Include(b=>b.Address).FirstOrDefaultAsync(b=>b.Id==buyerId);
             }
             catch (Exception ex)
             {
@@ -72,6 +72,7 @@ namespace InvoiceApplication.Services.Companies
                     existingBuyer.IsActive = buyer.IsActive;
                     existingBuyer.Name = buyer.Name;
                     existingBuyer.Phone = buyer.Phone;
+                    _context.Update(existingBuyer);
                     await _context.SaveChangesAsync();
                 }
                 else

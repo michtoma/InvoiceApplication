@@ -1,0 +1,106 @@
+﻿@inject ISellerService _sellerService
+@inject IAddresService _addressService
+@inject IAppUserService _userService;
+@inject NavigationManager _navigationManager
+@page "/NewSeller"
+
+<PageTitle>Your Company</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <h3>Your Company</h3>
+        <EditForm Model="seller" OnValidSubmit="SubmitForm">
+            <ChildContent Context="sellerContext">
+                <DataAnnotationsValidator />
+                <div class="row col-10">
+                    <div class="col-6">
+                        <label for="name">Name</label>
+                        <InputText id="sellerName" @bind-Value="seller.Name" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => seller.Name)" />
+                    </div>
+                    <div class="col-4">
+                        <label for="Nip">Nip</label>
+                        <InputText id="Nip" @bind-Value="seller.Nip" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => seller.Nip)" />
+                    </div>
+                    <div style="display: none;">
+                        <label for="id">Id</label>
+                        <InputNumber id="id" @bind-Value="seller.Id" class="form-control"></InputNumber>
+                        <ValidationMessage For="@(() => seller.Id)" />
+                    </div>
+                </div>
+                <div>
+                    <EditForm Model="address" OnValidSubmit="SubmitForm">
+                        <ChildContent Context="addressContext">
+                            <DataAnnotationsValidator />
+                            <div class="row col-10">
+
+                                <div class="col-3">
+                                    <label for="postalCode">Postal Code</label>
+                                    <InputText @bind-Value="address.PostalCode" class="form-control"></InputText>
+                                    <ValidationMessage For="@(() => address.PostalCode)" />
+                                </div>
+                                <div class="col-7">
+                                    <label for="city">City</label>
+                                    <InputText @bind-Value="address.City" class="form-control"></InputText>
+                                    <ValidationMessage For="@(() => address.City)" />
+                                </div>
+                                <div class="col-6">
+                                    <label for="street">Street</label>
+                                    <InputText @bind-Value="address.Street" class="form-control"></InputText>
+                                    <ValidationMessage For="@(() => address.Street)" />
+                                </div>
+                                <div class="col-2">
+                                    <label for="streetNumber">Street Number</label>
+                                    <InputText @bind-Value="address.StreetNumber" class="form-control"></InputText>
+                                    <ValidationMessage For="@(() => address.StreetNumber)" />
+                                </div>
+                                <div class="col-2">
+                                    <label for="apartmentNumber">Apartment Number</label>
+                                    <InputText @bind-Value="address.ApartmentNumber" class="form-control"></InputText>
+                                    <ValidationMessage For="@(() => address.ApartmentNumber)" />
+                                </div>
+                            </div>
+                        </ChildContent>
+                    </EditForm>
+                    <div class="row col-10">
+
+                        <div class="col-3">
+                            <label for="Phone">Phone</label>
+                            <InputText id="Phone" @bind-Value="seller.Phone" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => seller.Phone)" />
+                        </div>
+                        <div class="col-7">
+                            <label for="Email">Email</label>
+                            <InputText id="Email" @bind-Value="seller.Email" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => seller.Email)" />
+                        </div>
+                        <div class="m-3">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </ChildContent>
+        </EditForm>
+
+    </Authorized>
+    <NotAuthorized>
+        <p role="status">You are not authorized to see this content</p>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    Seller seller = new();
+    Address address = new();
+    private async void SubmitForm()
+    {
+        var userId = await _userService.GetLoggedUserId();
+        seller.UserId = userId;
+        await _sellerService.CreateSellerAsync(seller);
+        address.SellerId = seller.Id;
+        await _addressService.CreateAddressAsync(address);
+        seller.AddressId = address.Id;
+        await _sellerService.UpdateSellerAsync(seller);
+        _navigationManager.NavigateTo("/");
+        StateHasChanged();
+    }
+
+}

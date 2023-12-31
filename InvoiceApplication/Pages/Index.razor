@@ -1,11 +1,86 @@
 ﻿@page "/"
+@inject ISellerService _sellerservice
+@inject IAppUserService _userService
+@inject AuthenticationStateProvider _auth
 
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
-<h1>Hello, @context.User.Identity.Name</h1>
+        <h1>Hello @user.FirstName @user.LastName</h1>
+        <h2>Your Company</h2>
+        @if (seller is null)
+        {
+            <p>You didn't set your company, without that you can't create new invoice.</p>
+            <p>Please do that:</p>
+            <a class="btn btn-danger" href="/NewSeller">Add Your company</a>
+        }
+        else
+        {
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td>@seller.Name</td>
+                </tr>
+                <tr>
+                    <td>Nip</td>
+                    <td>@seller.Nip</td>
+                </tr>
+                <tr style="display: none;">
+                    <td>Id</td>
+                    <td>@seller.Id</td>
+                </tr>
+            </table>
+            <table>
+                @if (!(seller.Address is null))
+                {
+                    <tr>
+                        <td>Postal Code</td>
+                        <td>@seller.Address.PostalCode</td>
+                    </tr>
+                    <tr>
+                        <td>City</td>
+                        <td>@seller.Address.City</td>
+                    </tr>
+                    <tr>
+                        <td>Street</td>
+                        <td>@seller.Address.Street</td>
+                    </tr>
+                    <tr>
+                        <td>Street Number</td>
+                        <td>@seller.Address.StreetNumber</td>
+                    </tr>
+                    <tr>
+                        <td>Apartment Number</td>
+                        <td>@seller.Address.ApartmentNumber</td>
+                    </tr>
+
+                }
+            </table>
+            <table>
+                <tr>
+                    <td>Phone</td>
+                    <td>@seller.Phone</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>@seller.Email</td>
+                </tr>
+            </table>
+
+        }
 
 </AuthorizeView>
 
-Welcome to your Invoice app. 
+@code {
+    private AppUser user = new AppUser();
+    private Seller seller = new Seller();
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _auth.GetAuthenticationStateAsync();
+        var authUser = authState.User;
+        var users = await _userService.GetAll();
+        user = users.FirstOrDefault(u => u.UserName == authUser.Identity.Name);
+        var sellers = await _sellerservice.GetAllSellersAsync();
+        seller = sellers.FirstOrDefault(s => s.User.Id == user.Id);
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+}

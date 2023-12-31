@@ -34,12 +34,12 @@ namespace InvoiceApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("BuyerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Country")
                         .IsRequired()
@@ -52,6 +52,9 @@ namespace InvoiceApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("SellerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Street")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -62,13 +65,10 @@ namespace InvoiceApplication.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId")
-                        .IsUnique();
-
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Company", b =>
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Buyer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,13 +79,15 @@ namespace InvoiceApplication.Migrations
                     b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -100,13 +102,67 @@ namespace InvoiceApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SellerId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Company");
+                    b.HasIndex("AddressId")
+                        .IsUnique()
+                        .HasFilter("[AddressId] IS NOT NULL");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Company");
+                    b.HasIndex("AppUserId");
 
-                    b.UseTphMappingStrategy();
+                    b.HasIndex("SellerId");
+
+                    b.ToTable("Buyers");
+                });
+
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Seller", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVatPayer")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nip")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId")
+                        .IsUnique()
+                        .HasFilter("[AddressId] IS NOT NULL");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Sellers");
                 });
 
             modelBuilder.Entity("InvoiceApplication.Models.Invoices.Invoice", b =>
@@ -493,32 +549,9 @@ namespace InvoiceApplication.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Buyer", b =>
-                {
-                    b.HasBaseType("InvoiceApplication.Models.Companies.Company");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasDiscriminator().HasValue("Buyer");
-                });
-
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Seller", b =>
-                {
-                    b.HasBaseType("InvoiceApplication.Models.Companies.Company");
-
-                    b.Property<bool>("IsVatPayer")
-                        .HasColumnType("bit");
-
-                    b.HasDiscriminator().HasValue("Seller");
-                });
-
             modelBuilder.Entity("InvoiceApplication.Models.Companies.AppUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -528,20 +561,48 @@ namespace InvoiceApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("CompanyId");
+                    b.Property<int>("SellerId")
+                        .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("AppUser");
                 });
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Address", b =>
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Buyer", b =>
                 {
-                    b.HasOne("InvoiceApplication.Models.Companies.Company", "Company")
-                        .WithOne("Address")
-                        .HasForeignKey("InvoiceApplication.Models.Companies.Address", "CompanyId")
+                    b.HasOne("InvoiceApplication.Models.Companies.Address", "Address")
+                        .WithOne("Buyer")
+                        .HasForeignKey("InvoiceApplication.Models.Companies.Buyer", "AddressId");
+
+                    b.HasOne("InvoiceApplication.Models.Companies.AppUser", null)
+                        .WithMany("Buyers")
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("InvoiceApplication.Models.Companies.Seller", "Seller")
+                        .WithMany("Buyers")
+                        .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Company");
+                    b.Navigation("Address");
+
+                    b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Seller", b =>
+                {
+                    b.HasOne("InvoiceApplication.Models.Companies.Address", "Address")
+                        .WithOne("Seller")
+                        .HasForeignKey("InvoiceApplication.Models.Companies.Seller", "AddressId");
+
+                    b.HasOne("InvoiceApplication.Models.Companies.AppUser", "User")
+                        .WithOne("Seller")
+                        .HasForeignKey("InvoiceApplication.Models.Companies.Seller", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvoiceApplication.Models.Invoices.Invoice", b =>
@@ -660,20 +721,23 @@ namespace InvoiceApplication.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.AppUser", b =>
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Address", b =>
                 {
-                    b.HasOne("InvoiceApplication.Models.Companies.Company", "Company")
-                        .WithMany("Users")
-                        .HasForeignKey("CompanyId");
+                    b.Navigation("Buyer");
 
-                    b.Navigation("Company");
+                    b.Navigation("Seller");
                 });
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Company", b =>
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Buyer", b =>
                 {
-                    b.Navigation("Address");
+                    b.Navigation("Invoices");
+                });
 
-                    b.Navigation("Users");
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.Seller", b =>
+                {
+                    b.Navigation("Buyers");
+
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("InvoiceApplication.Models.Invoices.Invoice", b =>
@@ -686,14 +750,11 @@ namespace InvoiceApplication.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Buyer", b =>
+            modelBuilder.Entity("InvoiceApplication.Models.Companies.AppUser", b =>
                 {
-                    b.Navigation("Invoices");
-                });
+                    b.Navigation("Buyers");
 
-            modelBuilder.Entity("InvoiceApplication.Models.Companies.Seller", b =>
-                {
-                    b.Navigation("Invoices");
+                    b.Navigation("Seller");
                 });
 #pragma warning restore 612, 618
         }

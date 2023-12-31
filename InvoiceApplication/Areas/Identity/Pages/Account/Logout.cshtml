@@ -9,7 +9,8 @@
         if (signInManager.IsSignedIn(User))
         {
             await signInManager.SignOutAsync();
+            return LocalRedirect("/");
         }
-        return Redirect("~/");
+            return LocalRedirect("/");
     }
 }

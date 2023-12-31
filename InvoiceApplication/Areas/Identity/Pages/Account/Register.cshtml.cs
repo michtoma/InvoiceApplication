@@ -33,7 +33,7 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(identity, isPersistent: false);
-                    return LocalRedirect(ReturnUrl);
+                    return Redirect("/NewSeller");
                 }
             }
 
@@ -48,6 +48,10 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
             [Required]
             [DataType(DataType.Password)]
             public string Password { get; set; }
+            [Required]
+            [DataType(DataType.Password)]
+            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            public string ConfirmPassword { get; set; }
             [Required]
             [MinLength(4)]
             [Display(Name ="First Name")]

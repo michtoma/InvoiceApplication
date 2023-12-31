@@ -69,8 +69,9 @@ namespace InvoiceApplication.Services.Items
                 existingItem.Ean = item.Ean;
                 existingItem.Comments = item.Comments;
                 existingItem.NetPrice = item.NetPrice;
-                existingItem.VatRate = item.VatRate;
+                existingItem.VatRateID = item.VatRateID;
                 existingItem.Quantity = item.Quantity;
+                existingItem.UnitOfMeasureId = item.UnitOfMeasureId;
 
                 await _context.SaveChangesAsync();
             }

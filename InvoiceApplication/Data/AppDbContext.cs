@@ -7,13 +7,14 @@ using InvoiceApplication.Models.Items;
 using InvoiceApplication.Models.Invoices;
 using InvoiceApplication.Models.Companies;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace InvoiceApplication.Data
 {
     public class AppDbContext : IdentityDbContext
     {
 
-        public AppDbContext (DbContextOptions options)
+        public AppDbContext(DbContextOptions options)
             : base(options)
         {
         }
@@ -29,6 +30,9 @@ namespace InvoiceApplication.Data
         public DbSet<AppUser> AppUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<AppUser>().HasOne(a => a.Seller).WithOne(s => s.User).HasForeignKey<Seller>(s => s.UserId);
+            builder.Entity<Address>().HasOne(a => a.Buyer).WithOne(b => b.Address).HasForeignKey<Buyer>(b => b.AddressId);
+            builder.Entity<Address>().HasOne(a => a.Seller).WithOne(b => b.Address).HasForeignKey<Seller>(b => b.AddressId);
             base.OnModelCreating(builder);
         }
     }

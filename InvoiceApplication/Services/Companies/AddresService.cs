@@ -36,10 +36,10 @@ namespace InvoiceApplication.Services.Companies
             }
         }
 
-        public async Task<List<Address>> GetAddressByCompanyIdAsync(int companyId)
+        public async Task<List<Address>> GetAddressByBuyerIdAsync(int companyId)
         {
             using var _context = _contextFactoy.CreateDbContext();
-            return await _context.Addresses.Where(a=>a.CompanyId == companyId).ToListAsync();
+            return await _context.Addresses.Where(a=>a.BuyerId == companyId).ToListAsync();
         }
 
         public async Task<Address> GetAddressByIdAsync(int addressId)
@@ -75,7 +75,8 @@ namespace InvoiceApplication.Services.Companies
                     existingAddress.Street = address.Street;
                     existingAddress.City = address.City;
                     existingAddress.PostalCode = address.PostalCode;
-                    existingAddress.CompanyId = address.CompanyId;
+                    existingAddress.BuyerId = address.BuyerId;
+                    existingAddress.SellerId = address.SellerId;
                     existingAddress.Country = address.Country;
                     existingAddress.IsActive = address.IsActive;
                     await _context.SaveChangesAsync();

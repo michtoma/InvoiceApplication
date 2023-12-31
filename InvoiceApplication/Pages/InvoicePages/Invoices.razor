@@ -14,11 +14,11 @@
         }
         else
         {
-            <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationState" ResizableColumns="true" >
+            <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationState" ResizableColumns="true" Class="table table-striped" >
 
                     <PropertyColumn Property="@(i=>i.Number)" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.DateOfIssue)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
+                    <PropertyColumn Property="@(i=>i.DateOfIssue)" Format="dd-MM-yyyy" Title="Date of issue" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.PaymentDate)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>

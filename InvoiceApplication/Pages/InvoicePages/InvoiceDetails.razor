@@ -1,5 +1,7 @@
 ﻿@page "/invoice/{invoiceId:int?}"
 @inject IInvoiceService service
+@inject IBuyerService _buyerServie
+@inject ISellerService _sellerService
 @inject NavigationManager navigationManager
 <PageTitle>Invoice Details</PageTitle>
 <h3>Invoice Details</h3>
@@ -16,22 +18,22 @@ else
         <div class="row">
             <div class="col-6">
                 <div class="invoice-header-info">
-                    <div>@invoice.Seller.Name</div>
-                    <div>@invoice.SellerAddress.Street @invoice.SellerAddress.StreetNumber/@invoice.SellerAddress.ApartmentNumber</div>
-                    <div>@invoice.SellerAddress.PostalCode @invoice.SellerAddress.City</div>
-                    <div>NIP: @invoice.Seller.Nip</div>
-                    <div>Email: @invoice.Seller.Email</div>
-                    <div>Phone: @invoice.Seller.Phone</div>
+                    <div>@seller.Name</div>
+                    <div>@seller.Address.Street @seller.Address.StreetNumber/@seller.Address.ApartmentNumber</div>
+                    <div>@seller.Address.PostalCode @seller.Address.City</div>
+                    <div>NIP: @seller.Nip</div>
+                    <div>Email: @seller.Email</div>
+                    <div>Phone: @seller.Phone</div>
                 </div>
             </div>
             <div class="col-6 text-right">
                 <div class="invoice-header-info">
-                    <div>@invoice.Buyer.Name</div>
-                    <div>@invoice.BuyerAddress.Street @invoice.BuyerAddress.StreetNumber/@invoice.BuyerAddress.ApartmentNumber</div>
-                    <div>@invoice.BuyerAddress.PostalCode @invoice.BuyerAddress.City</div>
-                    <div>NIP: @invoice.Buyer.Nip</div>
-                    <div>Email: @invoice.Buyer.Email</div>
-                    <div>Phone: @invoice.Buyer.Phone</div>
+                    <div>@buyer.Name</div>
+                    <div>@buyer.Address.Street @buyer.Address.StreetNumber/@buyer.Address.ApartmentNumber</div>
+                    <div>@buyer.Address.PostalCode @buyer.Address.City</div>
+                    <div>NIP: @buyer.Nip</div>
+                    <div>Email: @buyer.Email</div>
+                    <div>Phone: @buyer.Phone</div>
                 </div>
             </div>
         </div>
@@ -113,7 +115,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         if (!(invoiceId == 0))
+        {
             invoice = await service.GetInvoiceByIdAsync((int)invoiceId);
+            buyer = await _buyerServie.GetBuyerByIdAsync((int)invoice.BuyerId);
+            seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+        }
     }
     private void BackToInvoiceList()
     {

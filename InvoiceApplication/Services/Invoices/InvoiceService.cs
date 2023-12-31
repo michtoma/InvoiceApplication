@@ -11,11 +11,13 @@ namespace InvoiceApplication.Services.Invoices
     public class InvoiceService : IInvoiceService
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactory;
-        
+        private readonly AuthenticationStateProvider _stateProvider;
 
-        public InvoiceService(IDbContextFactory<AppDbContext> contextFactory)
+
+        public InvoiceService(IDbContextFactory<AppDbContext> contextFactory, AuthenticationStateProvider stateProvider)
         {
             _contextFactory = contextFactory;
+            _stateProvider = stateProvider;
         }
 
         public async Task AddInvoiceAsync(Invoice invoice)
@@ -23,7 +25,7 @@ namespace InvoiceApplication.Services.Invoices
             using var _context = await _contextFactory.CreateDbContextAsync();
             var invoices = await GetAllInvoiceAsync();
             
-            
+
             Invoice numberExist = invoices.FirstOrDefault(i => i.Number.ToLower() == invoice.Number.ToLower());
             if (numberExist != null)
             {
@@ -47,17 +49,13 @@ namespace InvoiceApplication.Services.Invoices
         public async Task<List<Invoice>> GetAllInvoiceAsync()
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
-            return await _context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).
-                Include(i=>i.BuyerAddress).Include(i=>i.SellerAddress).
-                Include(i=>i.Seller).Include(i => i.Buyer).ToListAsync();
+            return await _context.Invoice.Include(i => i.InvoiceItems).ThenInclude(ii => ii.Item).ThenInclude(it => it.UnitOfMeasure).ToListAsync();
         }
 
         public async Task<Invoice> GetInvoiceByIdAsync(int id)
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
-            var invoice = await _context.Invoice.Include(i => i.InvoiceItems).ThenInclude(i=>i.Item).ThenInclude(i=>i.UnitOfMeasure).
-                Include(i => i.BuyerAddress).Include(i => i.SellerAddress).
-                Include(i => i.Seller).Include(i => i.Buyer).FirstOrDefaultAsync(i=> i.Id == id);
+            var invoice = await _context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).ThenInclude(it=>it.UnitOfMeasure).Include(i=>i.BuyerAddress).Include(i=>i.SellerAddress).FirstOrDefaultAsync(i=> i.Id == id);
 
             if (invoice != null)
             {

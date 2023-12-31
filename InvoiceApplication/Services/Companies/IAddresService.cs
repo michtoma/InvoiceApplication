@@ -9,6 +9,6 @@ namespace InvoiceApplication.Services.Companies
         Task CreateAddressAsync(Address address);
         Task DeleteAddressAsync(int addressId);
         Task UpdateAddressAsync (Address address);
-        Task<List<Address>> GetAddressByCompanyIdAsync(int companyId);
+        Task<List<Address>> GetAddressByBuyerIdAsync(int companyId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿@inject IBuyerService _buyerService
 @inject IAddresService _addressService
+@inject IAppUserService _userService
 @inject NavigationManager _navigationManager
 @page "/NewBuyer"
 <PageTitle>New Buyer</PageTitle>
@@ -90,9 +91,13 @@
     Address address = new();
     private async void SubmitForm()
     {
+        var user = await _userService.GetCurrentUser();
+        buyer.SellerId = user.Seller.Id;
         await _buyerService.CreateBuyerAsync(buyer);
-        address.CompanyId = buyer.Id;
+        address.BuyerId = buyer.Id;
         await _addressService.CreateAddressAsync(address);
+        buyer.AddressId = address.Id;
+        await _buyerService.UpdateBuyerAsync(buyer);
         _navigationManager.NavigateTo("/");
         StateHasChanged();
     }
