@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using InvoiceApplication.Models.Companies;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoiceApplication.Models.Items
@@ -18,6 +19,8 @@ namespace InvoiceApplication.Models.Items
         public int VatRateID { get; set; } = 1;
         public UnitOfMeasure? UnitOfMeasure { get; set; }
         public int UnitOfMeasureId { get; set; } = 1;
+        public Seller Seller { get; set; }
+        public int SellerId { get;set; }
         [NotMapped]
         public double GrossPrice
         {

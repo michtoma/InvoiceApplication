@@ -1,6 +1,7 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Items;
 using InvoiceApplication.Pages;
+using InvoiceApplication.Services.Companies;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApplication.Services.Items
@@ -8,10 +9,12 @@ namespace InvoiceApplication.Services.Items
     public class ItemService : IItemService
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactoy;
-        
-        public ItemService(IDbContextFactory<AppDbContext> contextFactoy)
+        private readonly IAppUserService _userService;
+
+        public ItemService(IDbContextFactory<AppDbContext> contextFactoy, IAppUserService userService)
         {
             _contextFactoy = contextFactoy;
+            _userService = userService;
         }
 
         public async Task AddNewItemAsync(Item item)
@@ -54,6 +57,15 @@ namespace InvoiceApplication.Services.Items
             {
                 throw new InvalidOperationException("Item not found");
             }
+        }
+
+        public async Task<List<Item>> GetUSerItemsAsync()
+        {
+            using var _context = _contextFactoy.CreateDbContext();
+            var user =await _userService.GetCurrentUser();
+
+            return await _context.Item.Where(i=>i.SellerId==user.Seller.Id).Include(v => v.VatRate).Include(i => i.UnitOfMeasure).ToListAsync();
+
         }
 
         public async Task UpdateItemAsync(Item item)

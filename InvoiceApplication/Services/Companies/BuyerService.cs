@@ -7,10 +7,12 @@ namespace InvoiceApplication.Services.Companies
     public class BuyerService : IBuyerService
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactoy;
+        private readonly IAppUserService _userService;
 
-        public BuyerService(IDbContextFactory<AppDbContext> contextFactoy)
+        public BuyerService(IDbContextFactory<AppDbContext> contextFactoy, IAppUserService userService)
         {
             _contextFactoy = contextFactoy;
+            _userService = userService;
         }
 
         public async Task CreateBuyerAsync(Buyer buyer)
@@ -55,6 +57,12 @@ namespace InvoiceApplication.Services.Companies
             using var _context = _contextFactoy.CreateDbContext();
             return await _context.Buyers.ToListAsync();
         }
+        public async Task<List<Buyer>> GetUserBuyersAsync()
+        {
+            using var _context = _contextFactoy.CreateDbContext();
+            var user =await _userService.GetCurrentUser();
+            return await _context.Buyers.Where(b=> b.SellerId==user.Seller.Id).Include(b=>b.Address).ToListAsync();
+        }
 
         public async Task UpdateBuyerAsync(Buyer buyer)
         {
@@ -72,6 +80,7 @@ namespace InvoiceApplication.Services.Companies
                     existingBuyer.IsActive = buyer.IsActive;
                     existingBuyer.Name = buyer.Name;
                     existingBuyer.Phone = buyer.Phone;
+                    existingBuyer.SellerId = buyer.SellerId;
                     _context.Update(existingBuyer);
                     await _context.SaveChangesAsync();
                 }

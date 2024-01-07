@@ -15,55 +15,77 @@
     <h3>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
 <EditForm Model="invoice" OnValidSubmit="HeaderConirmation">
     <DataAnnotationsValidator />
-    <div class="row">
-        <div>
-            <label for="buyer">Buyer</label>
-            <InputSelect id="buyer" class="form-control my-1" ValueExpression="@(()=>invoice.BuyerId)" Value="@invoice.BuyerId" ValueChanged="@((int? args) => { invoice.BuyerId = args; AddressSet(args); })">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="buyer" class="form-label">Buyer</label>
+            <InputSelect id="buyer" class="form-select" ValueExpression="@(()=>invoice.BuyerId)" Value="@invoice.BuyerId" ValueChanged="@((int? args) => { invoice.BuyerId = args; AddressSet(args); })" required>
                 <option value="" selected disabled>Select Company</option>
                 @foreach (var buyer in buyers)
                 {
                     <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
                 }
             </InputSelect>
-            <label for="buyerAddress">Address</label>
-            <InputSelect id="buyerAddress" @bind-Value="invoice.BuyerAddressId" class="form-control my-1">
-                <option value="" selected disabled>Select Company Address</option>
-                @foreach (var address in buyerAddresses)
-                {
-                    <option value="@address.Id">
-                       City: @address.City Street: @address.Street @address.StreetNumber / @address.ApartmentNumber
-                    </option>
-                }
-            </InputSelect>
-
+            @if (buyerAddress is not null)
+            {
+                <div class="mt-2">
+                    <label class="fw-bold">Buyer Address:</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="street" class="form-label">Street:</label>
+                            <input type="text" id="street" name="street" value="@buyerAddress.Street" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="streetNumber" class="form-label">Street Number:</label>
+                            <input type="text" id="streetNumber" name="streetNumber" value="@buyerAddress.StreetNumber" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="apartmentNumber" class="form-label">Apartment Number:</label>
+                            <input type="text" id="apartmentNumber" name="apartmentNumber" value="@buyerAddress.ApartmentNumber" class="form-control" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="postalCode" class="form-label">Postal Code:</label>
+                            <input type="text" id="postalCode" name="postalCode" value="@buyerAddress.PostalCode" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="city" class="form-label">City:</label>
+                            <input type="text" id="city" name="city" value="@buyerAddress.City" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="country" class="form-label">Country:</label>
+                            <input type="text" id="country" name="country" value="@buyerAddress.Country" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-        <div class="col-4">
-            <label for="number">Number</label>
+        <div class="col-md-3">
+            <label for="number" class="form-label">Number</label>
             <InputText id="number" @bind-Value="invoice.Number" class="form-control" disabled></InputText>
             <ValidationMessage For="@(() => invoice.Number)" />
         </div>
-        <div class="col-2">
-            <label for="createDate">Create Date</label>
+        <div class="col-md-3">
+            <label for="createDate" class="form-label">Create Date</label>
             <InputDate id="createDate" @bind-Value="invoice.CreateDate" class="form-control" disabled></InputDate>
             <ValidationMessage For=@(()=>invoice.CreateDate) />
         </div>
-        <div class="col-2">
-            <label for="days">Payment term</label>
-            <InputNumber id="days" @bind-Value="invoice.DaysOfPaiment" class="form-control"></InputNumber>
-            <ValidationMessage For=@(()=>invoice.DaysOfPaiment) />
+        <div class="mb-3">
+            <label class="fw-bold">Payment Information:</label>
+            <div>
+                <label>Number of days of payment deadline: </label>
+                <InputNumber id="days" @bind-Value="invoice.DaysOfPaiment"></InputNumber>
+                <label>Payment deadline: @DateOnly.FromDateTime(invoice.PaymentDate)</label>
+            </div>
+            <label for="description" class="form-label">Description</label>
+            <InputText id="description" @bind-Value="invoice.Description" class="form-control"></InputText>
+            <ValidationMessage For=@(()=>invoice.Description) />
         </div>
-    </div>
-    <div>
-        <label>Payment deadline: @DateOnly.FromDateTime(invoice.PaymentDate)</label>
-    </div>
-    <div>
-        <label for="description">Description</label>
-        <InputText id="description" @bind-Value="invoice.Description" class="form-control"></InputText>
-        <ValidationMessage For=@(()=>invoice.Description) />
     </div>
     <button class="btn btn-success my-2" type="submit">@((invoiceId == null || invoiceId == 0) ? "Save Invoice" : "Update Invoice Header")</button>
 </EditForm>
-<div>
+
+<div class="mt-4">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -86,13 +108,11 @@
                     <tr>
                         <td>@(index + 1)</td>
                         <td>
-                            @item.Item.Name @if (item.Description != "" || item.Description is not null)
+                            @item.Item.Name
+                            @if (item.Description !="")
                             {
                                 <br />
-                                <textarea readonly class="flex-column">
-
-                                    @item.Description
-                                                                                </textarea>
+                                <textarea readonly class="form-control">@item.Description</textarea>
                             }
                         </td>
                         <td>@item.Item.UnitOfMeasure.ShortName</td>
@@ -101,7 +121,10 @@
                         <td>@item.TotalNetValue.ToString("0.00")</td>
                         <td>@item.VatRate</td>
                         <td>@item.TotalGrossValue.ToString("0.00")</td>
-                        <td><button class="btn btn-dark" @onclick="(i=> EditInvoiceItem(item.Id))">Edit</button> | <button class="btn btn-danger" @onclick="(i=> DeleteInvoiceItem(item.Id))">Delete</button></td>
+                        <td>
+                            <button class="btn btn-dark" @onclick="(i=> EditInvoiceItem(item.Id))">Edit</button>
+                            <button class="btn btn-danger ms-2" @onclick="(i=> DeleteInvoiceItem(item.Id))">Delete</button>
+                        </td>
                     </tr>
                 }
             }
@@ -116,14 +139,15 @@
         </tbody>
     </table>
 </div>
-<div>
 
+<div class="mt-2">
     @if (!(invoiceId == null || invoiceId == 0))
     {
         <button class="btn btn-outline-secondary me-2" @onclick="showItemsModal">Add Item to Invoice </button>
     }
     <a class="btn btn-secondary my-2" href=" Invoices">Back to Invoice List </a>
 </div>
+
 @code {
     bool modalConfirmed = false;
     bool toDelete = false;
@@ -131,25 +155,21 @@
     public int? invoiceId { get; set; }
     ModalMessage modalModelMessage = new();
     Invoice invoice = new();
-    Seller seller = new();
     Buyer buyer = new();
     List<Item> items = new();
-    List<Seller> sellers = new();
     List<Buyer> buyers = new();
-    List<Address> sellerAddresses = new();
-    List<Address> buyerAddresses = new();
+    Address buyerAddress = new();
     ModalItemsInvoiceEdit modalInvItemEdit;
     bool isVisibleItemsModal = false;
     protected override async Task OnInitializedAsync()
     {
-        items = await _itemService.GetAllItemsAsync();
-        buyers = await _buyerService.GetAllBuyersAsync();
-        sellers = await _sellerService.GetAllSellersAsync();
+        items = await _itemService.GetUSerItemsAsync();
+        buyers = await _buyerService.GetUserBuyersAsync();
         if (!(invoiceId == 0 || invoiceId == null))
         {
             invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
             buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
-            seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+            buyerAddress = await _addressService.GetAddressByIdAsync(buyer.Address.Id);
         }
         else
         {
@@ -158,12 +178,9 @@
     }
     async void AddressSet(int? i)
     {
-        sellerAddresses = new();
-        buyerAddresses = new();
-        if (invoice.SellerId is not null) sellerAddresses = await _addressService.GetAddressByBuyerIdAsync((int)invoice.SellerId);
-        if (invoice.BuyerId is not null) buyerAddresses = await _addressService.GetAddressByBuyerIdAsync((int)invoice.BuyerId);
-        if (invoice.SellerId is not null) seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+        buyerAddress = new();
         if (invoice.BuyerId is not null) buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
+        if (invoice.BuyerId is not null) buyerAddress = await _addressService.GetAddressByIdAsync(buyer.Address.Id);
         StateHasChanged();
     }
     void HeaderConirmation()
@@ -239,7 +256,7 @@
         modalModelMessage.Body = "The item has been successfully added to the invoice";
         modalModelMessage.isVisible = true;
         StateHasChanged();
-
+        await OnInitializedAsync();
     }
     private async void EditInvoiceItem(int invoiceItemId)
     {
@@ -247,6 +264,7 @@
         modalInvItemEdit.isVisible = true;
         modalInvItemEdit.wasEdited = false;
         StateHasChanged();
+       
     }
     private async void CloseEditInvoiceItem()
     {

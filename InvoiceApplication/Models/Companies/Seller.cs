@@ -1,4 +1,5 @@
 ﻿using InvoiceApplication.Models.Invoices;
+using InvoiceApplication.Models.Items;
 using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceApplication.Models.Companies
@@ -23,6 +24,7 @@ namespace InvoiceApplication.Models.Companies
         public AppUser? User { get; set; }
         public string UserId { get; set; }
         public IEnumerable<Buyer> Buyers { get; set; } = Enumerable.Empty<Buyer>();
+        public IEnumerable<Item> Items { get; set; } = Enumerable.Empty<Item>();
 
     }
 }

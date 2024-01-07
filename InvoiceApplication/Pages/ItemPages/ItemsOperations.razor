@@ -1,6 +1,7 @@
 ﻿@inject IItemService itemService
 @inject IVatRateService vatService
 @inject IUnitOfMeasureService measurService
+@inject IAppUserService userService
 @if (isVisible)
 {
     <div class="modal modal-dialog-centered" tabindex="-1" role="dialog" id="modalChoice">
@@ -114,6 +115,8 @@
     {
         if (isNew)
         {
+            var user = await userService.GetCurrentUser();
+            item.SellerId = user.Seller.Id;
             await itemService.AddNewItemAsync(item);
             Close();
         }

@@ -73,7 +73,7 @@ namespace InvoiceApplication.Services.Invoices
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
             var user = await _userService.GetCurrentUser();
-            return await _context.Invoice.Where(i=>i.AppUserId == user.Id).ToListAsync();
+            return await _context.Invoice.Where(i=>i.AppUserId == user.Id).Include(i => i.InvoiceItems).ThenInclude(ii => ii.Item).ThenInclude(it => it.UnitOfMeasure).Include(i => i.BuyerAddress).Include(i => i.SellerAddress).ToListAsync();
         }
 
         public async Task<bool> InvoiceExist(int invoiceId)

@@ -31,6 +31,10 @@ namespace InvoiceApplication.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<AppUser>().HasOne(a => a.Seller).WithOne(s => s.User).HasForeignKey<Seller>(s => s.UserId);
+            builder.Entity<Item>()
+                    .HasOne(i => i.Seller)
+                    .WithMany(s => s.Items)
+                    .HasForeignKey(s => s.SellerId);
             builder.Entity<Address>().HasOne(a => a.Buyer).WithOne(b => b.Address).HasForeignKey<Buyer>(b => b.AddressId);
             builder.Entity<Address>().HasOne(a => a.Seller).WithOne(b => b.Address).HasForeignKey<Seller>(b => b.AddressId);
             base.OnModelCreating(builder);

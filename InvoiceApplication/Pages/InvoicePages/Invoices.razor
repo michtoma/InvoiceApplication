@@ -25,10 +25,6 @@
                     <TemplateColumn Title="Action Buttons">
                         <button class="btn btn-danger" @onclick="(d=> ShowInvoiceDetails(context.Id))">View</button>
                         <button class="btn btn-dark" @onclick="(e=> EditInvoice(context.Id))">Edit</button>
-                        @if (context.IsEditable)
-                        {
-                            <button class="btn btn-danger" @onclick="(d=> DeleteInvoice(context.Id))">Delete</button>
-                        }
                     </TemplateColumn>
             </QuickGrid>
             <Paginator Value="paginationState" />
@@ -58,7 +54,7 @@
     {
         var invoiceToDelete = await _invoiceService.GetInvoiceByIdAsync(InvoiceId);
         await _invoiceService.DeleteInvoiceAsync(invoiceToDelete);
-        invoices = await _invoiceService.GetAllInvoiceAsync();
+        invoices = await _invoiceService.GetUSerInvoicesAsync();
         StateHasChanged();
     }
 }

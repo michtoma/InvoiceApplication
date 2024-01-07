@@ -17,9 +17,8 @@ namespace InvoiceApplication.Services.Invoices
         public async Task<string> GenerateInvoiceNumber(DateTime dateTime)
         {
             var user = await _appUserService.GetCurrentUser();
-            var invoices = await _invoiceService.GetAllInvoiceAsync();
-            var userInvoices = invoices.Where(i=>i.AppUserId==user.Id && i.CreateDate.Year==dateTime.Year && i.CreateDate.Month==dateTime.Month).ToList();
-            StringBuilder stringBuilder = new StringBuilder();
+            var userInvoices =await _invoiceService.GetUSerInvoicesAsync();
+            StringBuilder stringBuilder = new();
             stringBuilder.Append("FV/");
             stringBuilder.Append((userInvoices.Count()+1).ToString());
             stringBuilder.Append('/');

@@ -98,7 +98,7 @@
         await _addressService.CreateAddressAsync(address);
         buyer.AddressId = address.Id;
         await _buyerService.UpdateBuyerAsync(buyer);
-        _navigationManager.NavigateTo("/");
+        _navigationManager.NavigateTo("/Buyers");
         StateHasChanged();
     }
 

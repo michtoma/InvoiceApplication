@@ -16,6 +16,10 @@
         {
             <p>        Loading ....    </p>
         }
+        else if (items.Count()==0)
+        {
+            <p>Look like is nothing to show</p>
+        }
         else
         {
 
@@ -48,7 +52,7 @@
     List<Item> items = new List<Item>();
     protected override async Task OnInitializedAsync()
     {
-        items = await service.GetAllItemsAsync();
+        items = await service.GetUSerItemsAsync();
         item = new Item();
     }
     private void addNew()
@@ -80,7 +84,7 @@
     private async void ClickHandler()
     {
         addNewVisisble = false;
-        items = await service.GetAllItemsAsync();
+        items = await service.GetUSerItemsAsync();
         StateHasChanged();
     }
 }

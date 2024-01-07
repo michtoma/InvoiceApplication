@@ -9,5 +9,6 @@ namespace InvoiceApplication.Services.Companies
         Task CreateBuyerAsync(Buyer buyer);
         Task DeleteBuyerAsync(int buyerId);
         Task UpdateBuyerAsync(Buyer buyer);
+        Task<List<Buyer>> GetUserBuyersAsync();
     }
 }
