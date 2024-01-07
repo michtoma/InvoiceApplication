@@ -6,22 +6,10 @@
         <NavMenu />
     </div>
     <main>
-        <AuthorizeView>
-            <Authorized>
-                <div class="top-row px-4">
-                    <a target="_blank">@context.User.Identity.Name</a>
-                    <a href="/identity/logout" target="_blank">Logout</a>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="top-row px-4">
-                    <a class="btn btn-outline-primary" href="/identity/login">Login</a>
-                    <a class="btn btn-outline-primary" href="/identity/Register">Register</a>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-
-
+        <div class="top-row px-4">
+            <LoginDisplay></LoginDisplay>
+            
+        </div>
         <article class="content px-4">
             <AuthorizeView>
                 <Authorized>

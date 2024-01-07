@@ -6,21 +6,30 @@ using System.ComponentModel.DataAnnotations;
 
 namespace InvoiceApplication.Areas.Identity.Pages.Account
 {
-    public class Register : PageModel
+    public class Manage : PageModel
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
-        public Register(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public Manage(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
         }
         [BindProperty]
-        public InputModel Input { get; set; }
+        public UpdateModel Input { get; set; }
         public string ReturnUrl { get; set; }
-        public void OnGet()
+        public async Task OnGet()
         {
+
             ReturnUrl = Url.Content("~/");
+            var user = await _userManager.GetUserAsync(User);
+            Input = new UpdateModel
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+
+            };
 
         }
         public async Task<IActionResult> OnPostAsync()
@@ -28,33 +37,30 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
             ReturnUrl = Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var identity = new AppUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName };
-                var result = await _userManager.CreateAsync(identity, Input.Password);
+                var user = await _userManager.GetUserAsync(User);
+                user.UserName = Input.Email;
+                user.Email = Input.Email;
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+                var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(identity, isPersistent: false);
-                    return Redirect("/NewSeller");
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return Redirect("/");
                 }
             }
 
             return Page();
 
         }
-        public class InputModel
+        public class UpdateModel
         {
             [Required]
             [DataType(DataType.EmailAddress)]
             public string Email { get; set; }
             [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
-            [Required]
-            [DataType(DataType.Password)]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-            [Required]
             [MinLength(4)]
-            [Display(Name ="First Name")]
+            [Display(Name = "First Name")]
             public string FirstName { get; set; }
             [Required]
             [MinLength(4)]

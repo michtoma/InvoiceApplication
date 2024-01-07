@@ -1,7 +1,7 @@
-﻿@page "/identity/register"
-@model InvoiceApplication.Areas.Identity.Pages.Account.Register
+﻿@page 
+@model InvoiceApplication.Areas.Identity.Pages.Account.Manage
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Manage";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -9,7 +9,7 @@
     <div class="col-md-4">
         <section>
             <form id="account" method="post">
-                <h2>Register a new user</h2>
+                <h2>Update user</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-floating" style="margin:10px">
@@ -27,18 +27,8 @@
                     <label asp-for="Input.Email" class="form-label"></label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-floating" style="margin:10px">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
-                    <label asp-for="Input.Password" class="form-label"></label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="form-floating" style="margin:10px">
-                    <input asp-for="Input.ConfirmPassword" type="password" class="form-control" autocomplete="new-password" aria-required="true" />
-                    <label asp-for="Input.ConfirmPassword" class="form-label"></label>
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                </div>
                 <div style="margin:10px">
-                    <button id="login-submit" type="submit" class="w-100 btn-lg btn-primary">Register</button>
+                    <button id="login-submit" type="submit" class="w-100 btn-lg btn-primary">Update</button>
                 </div>
             </form>
         </section>
