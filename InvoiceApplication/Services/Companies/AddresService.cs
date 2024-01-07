@@ -79,6 +79,7 @@ namespace InvoiceApplication.Services.Companies
                     existingAddress.SellerId = address.SellerId;
                     existingAddress.Country = address.Country;
                     existingAddress.IsActive = address.IsActive;
+                    _context.Update(existingAddress);
                     await _context.SaveChangesAsync();
                 }
                 else

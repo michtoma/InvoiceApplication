@@ -5,68 +5,71 @@
 
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
-        <h1>Hello @user.FirstName @user.LastName</h1>
-        <h2>Your Company</h2>
-        @if (seller is null)
-        {
-            <p>You didn't set your company, without that you can't create new invoice.</p>
-            <p>Please do that:</p>
-            <a class="btn btn-danger" href="/NewSeller">Add Your company</a>
-        }
-        else
-        {
-            <table>
-                <tr>
-                    <td>Name</td>
-                    <td>@seller.Name</td>
-                </tr>
-                <tr>
-                    <td>Nip</td>
-                    <td>@seller.Nip</td>
-                </tr>
-                <tr style="display: none;">
-                    <td>Id</td>
-                    <td>@seller.Id</td>
-                </tr>
-            </table>
-            <table>
-                @if (!(seller.Address is null))
-                {
-                    <tr>
-                        <td>Postal Code</td>
-                        <td>@seller.Address.PostalCode</td>
-                    </tr>
-                    <tr>
-                        <td>City</td>
-                        <td>@seller.Address.City</td>
-                    </tr>
-                    <tr>
-                        <td>Street</td>
-                        <td>@seller.Address.Street</td>
-                    </tr>
-                    <tr>
-                        <td>Street Number</td>
-                        <td>@seller.Address.StreetNumber</td>
-                    </tr>
-                    <tr>
-                        <td>Apartment Number</td>
-                        <td>@seller.Address.ApartmentNumber</td>
-                    </tr>
+    <h1>Hello @user.FirstName @user.LastName</h1>
+    @if (seller is null)
+    {
+        <p>You didn't set your company, without that you can't create new invoice.</p>
+        <p>Please do that:</p>
+        <a class="btn btn-danger" href="/NewSeller">Add Your company</a>
+    }
+    else
+    {
+        <div class="container mt-4">
+            <h4>Your Company:</h4>
+            <table class="table table-striped">
 
-                }
+                <tbody>
+                    <tr>
+                        <th scope="row">Name</th>
+                        <td>@seller.Name</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Nip</th>
+                        <td>@seller.Nip</td>
+                    </tr>
+                    <tr class="d-none">
+                        <th scope="row">Id</th>
+                        <td>@seller.Id</td>
+                    </tr>
+                    @if (!(seller.Address is null))
+                    {
+                        <tr>
+                            <th scope="row">Postal Code</th>
+                            <td>@seller.Address.PostalCode</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">City</th>
+                            <td>@seller.Address.City</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Street</th>
+                            <td>@seller.Address.Street</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Street Number</th>
+                            <td>@seller.Address.StreetNumber</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Apartment Number</th>
+                            <td>@seller.Address.ApartmentNumber</td>
+                        </tr>
+                    }
+                    <tr>
+                        <th scope="row">Phone</th>
+                        <td>@seller.Phone</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>@seller.Email</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Vat Payer</th>
+                        <td>@seller.IsVatPayer</td>
+                    </tr>
+                </tbody>
             </table>
-            <table>
-                <tr>
-                    <td>Phone</td>
-                    <td>@seller.Phone</td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td>@seller.Email</td>
-                </tr>
-            </table>
-
-        }
+        </div>
+    }
 
 </AuthorizeView>
 

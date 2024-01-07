@@ -1,6 +1,7 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Companies;
 using InvoiceApplication.Models.Invoices;
+using InvoiceApplication.Services.Companies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,22 +12,22 @@ namespace InvoiceApplication.Services.Invoices
     public class InvoiceService : IInvoiceService
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactory;
-        private readonly AuthenticationStateProvider _stateProvider;
+        private readonly IAppUserService _userService;
 
 
-        public InvoiceService(IDbContextFactory<AppDbContext> contextFactory, AuthenticationStateProvider stateProvider)
+        public InvoiceService(IDbContextFactory<AppDbContext> contextFactory, IAppUserService userService)
         {
             _contextFactory = contextFactory;
-            _stateProvider = stateProvider;
+            _userService = userService;
         }
 
         public async Task AddInvoiceAsync(Invoice invoice)
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
-            var invoices = await GetAllInvoiceAsync();
+            var invoices = await GetUSerInvoicesAsync();
             
 
-            Invoice numberExist = invoices.FirstOrDefault(i => i.Number.ToLower() == invoice.Number.ToLower());
+            Invoice numberExist =invoices.FirstOrDefault(i => i.Number.ToLower() == invoice.Number.ToLower());
             if (numberExist != null)
             {
                 throw new InvalidOperationException("Invoice with this Number allready exist !!!");
@@ -68,6 +69,13 @@ namespace InvoiceApplication.Services.Invoices
             }
         }
 
+        public async Task<List<Invoice>> GetUSerInvoicesAsync()
+        {
+            using var _context = await _contextFactory.CreateDbContextAsync();
+            var user = await _userService.GetCurrentUser();
+            return await _context.Invoice.Where(i=>i.AppUserId == user.Id).ToListAsync();
+        }
+
         public async Task<bool> InvoiceExist(int invoiceId)
         {
             using var _context = await _contextFactory.CreateDbContextAsync();
@@ -83,7 +91,6 @@ namespace InvoiceApplication.Services.Invoices
             {
                 oldInvoice.InvoiceItems = invoice.InvoiceItems;
                 oldInvoice.Number = invoice.Number;
-                oldInvoice.DateOfIssue = invoice.DateOfIssue;
                 oldInvoice.CreateDate = invoice.CreateDate;
                 oldInvoice.DaysOfPaiment = invoice.DaysOfPaiment;
                 oldInvoice.Description = invoice.Description;

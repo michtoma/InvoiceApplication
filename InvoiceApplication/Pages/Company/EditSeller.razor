@@ -2,17 +2,17 @@
 @inject IAddresService _addressService
 @inject IAppUserService _userService;
 @inject NavigationManager _navigationManager
-@page "/NewSeller"
+@page "/EditSeller"
 
-<PageTitle>Your Company</PageTitle>
+<PageTitle>Edit Your Company</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <h3>Your Company</h3>
+        <h3><PageTitle/></h3>
         <EditForm Model="seller" OnValidSubmit="SubmitForm">
             <ChildContent Context="sellerContext">
                 <DataAnnotationsValidator />
                 <div class="row col-10">
-                    <div class="col-6">
+                    <div class="col-5">
                         <label for="name">Name</label>
                         <InputText id="sellerName" @bind-Value="seller.Name" class="form-control"></InputText>
                         <ValidationMessage For="@(() => seller.Name)" />
@@ -27,10 +27,10 @@
                         <InputNumber id="id" @bind-Value="seller.Id" class="form-control"></InputNumber>
                         <ValidationMessage For="@(() => seller.Id)" />
                     </div>
-                    <div class="col-3">
+                    <div class="col-1">
                         <label for="Vat">Vat Payer</label>
                         <InputCheckbox id="Vat" @bind-Value="seller.IsVatPayer" class="form-check-label"></InputCheckbox>
-                        <ValidationMessage For="@(() => seller.IsVatPayer)"/>
+                        <ValidationMessage For="@(() => seller.IsVatPayer)" />
                     </div>
                 </div>
                 <div>
@@ -80,7 +80,7 @@
                             <ValidationMessage For="@(() => seller.Email)" />
                         </div>
                         <div class="m-3">
-                            <button type="submit" class="btn btn-primary">Add</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </div>
                 </div>
@@ -95,13 +95,20 @@
 @code {
     Seller seller = new();
     Address address = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user =await _userService.GetCurrentUser();
+        seller = await _sellerService.GetSellerByIdAsync(user.Seller.Id);
+        address = await _addressService.GetAddressByIdAsync((int)seller.AddressId);
+    }
     private async void SubmitForm()
     {
         var userId = await _userService.GetLoggedUserId();
         seller.UserId = userId;
-        await _sellerService.CreateSellerAsync(seller);
+        await _sellerService.UpdateSellerAsync(seller);
         address.SellerId = seller.Id;
-        await _addressService.CreateAddressAsync(address);
+        await _addressService.UpdateAddressAsync(address);
         seller.AddressId = address.Id;
         await _sellerService.UpdateSellerAsync(seller);
         _navigationManager.NavigateTo("/");

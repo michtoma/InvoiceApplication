@@ -7,6 +7,7 @@
 @inject ISellerService _sellerService
 @inject IAddresService _addressService
 @inject IAppUserService _userService
+@inject INumberGenerator _numberGenerator
 <PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
     <ModalWindow modalMessage="modalModelMessage" onCancel="onCancel" onConfirm="onConfirm" forDelete="toDelete"></ModalWindow>
     <ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
@@ -15,8 +16,6 @@
 <EditForm Model="invoice" OnValidSubmit="HeaderConirmation">
     <DataAnnotationsValidator />
     <div class="row">
-
-
         <div>
             <label for="buyer">Buyer</label>
             <InputSelect id="buyer" class="form-control my-1" ValueExpression="@(()=>invoice.BuyerId)" Value="@invoice.BuyerId" ValueChanged="@((int? args) => { invoice.BuyerId = args; AddressSet(args); })">
@@ -26,13 +25,13 @@
                     <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
                 }
             </InputSelect>
-            <button class="btn btn-primary my-1">Add new Address</button>
+            <label for="buyerAddress">Address</label>
             <InputSelect id="buyerAddress" @bind-Value="invoice.BuyerAddressId" class="form-control my-1">
                 <option value="" selected disabled>Select Company Address</option>
                 @foreach (var address in buyerAddresses)
                 {
                     <option value="@address.Id">
-                        @address.City @address.Street
+                       City: @address.City Street: @address.Street @address.StreetNumber / @address.ApartmentNumber
                     </option>
                 }
             </InputSelect>
@@ -40,18 +39,13 @@
         </div>
         <div class="col-4">
             <label for="number">Number</label>
-            <InputText id="number" @bind-Value="invoice.Number" class="form-control"></InputText>
+            <InputText id="number" @bind-Value="invoice.Number" class="form-control" disabled></InputText>
             <ValidationMessage For="@(() => invoice.Number)" />
         </div>
         <div class="col-2">
             <label for="createDate">Create Date</label>
-            <InputDate id="createDate" @bind-Value="invoice.CreateDate" class="form-control"></InputDate>
+            <InputDate id="createDate" @bind-Value="invoice.CreateDate" class="form-control" disabled></InputDate>
             <ValidationMessage For=@(()=>invoice.CreateDate) />
-        </div>
-        <div class="col-2">
-            <label for="issueDate">Issue Date</label>
-            <InputDate id="createDate" @bind-Value="invoice.DateOfIssue" class="form-control"></InputDate>
-            <ValidationMessage For=@(()=>invoice.DateOfIssue) />
         </div>
         <div class="col-2">
             <label for="days">Payment term</label>
@@ -156,6 +150,10 @@
             invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
             buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
             seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+        }
+        else
+        {
+            invoice.Number = await _numberGenerator.GenerateInvoiceNumber(invoice.CreateDate);
         }
     }
     async void AddressSet(int? i)

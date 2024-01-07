@@ -36,6 +36,7 @@ builder.Services.AddScoped<IBuyerService, BuyerService>();
 builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<IAddresService, AddresService>();
 builder.Services.AddScoped<IAppUserService, AppUserService>();
+builder.Services.AddScoped<INumberGenerator, NumberGenerator>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

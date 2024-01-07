@@ -18,7 +18,6 @@
 
                     <PropertyColumn Property="@(i=>i.Number)" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.DateOfIssue)" Format="dd-MM-yyyy" Title="Date of issue" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.PaymentDate)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
@@ -45,7 +44,7 @@
     PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
     protected override async Task OnInitializedAsync()
     {
-        invoices = await _invoiceService.GetAllInvoiceAsync();
+        invoices = await _invoiceService.GetUSerInvoicesAsync();
     }
     private void EditInvoice(int InvoiceId)
     {

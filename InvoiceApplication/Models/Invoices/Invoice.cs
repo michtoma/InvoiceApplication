@@ -8,7 +8,6 @@ namespace InvoiceApplication.Models.Invoices
         public int Id { get; set; }
         public string Number { get; set; } = string.Empty;
         public DateTime CreateDate { get; set; } = DateTime.Now;
-        public DateTime DateOfIssue { get; set; } = DateTime.Now;
         public Buyer? Buyer { get; set; }
         public int? BuyerId { get; set; }
         public Seller? Seller { get; set; }
@@ -23,7 +22,7 @@ namespace InvoiceApplication.Models.Invoices
         {
             get
             {
-              return DateOfIssue.AddDays(DaysOfPaiment);
+              return CreateDate.AddDays(DaysOfPaiment);
             }
         }
         public bool IsPaid { get; set; } = false;
