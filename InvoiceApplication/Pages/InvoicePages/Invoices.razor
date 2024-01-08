@@ -1,6 +1,6 @@
 ﻿@page "/invoices"
-@inject IInvoiceService _invoiceService
-@inject NavigationManager navigationManager
+@inject IInvoiceService InvoiceService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Invoice List</PageTitle>
 <AuthorizeView>
@@ -8,13 +8,13 @@
          
         <h3>Invoice List</h3>
         <a class="btn btn-outline-primary" href="invoiceAction">Add New</a>
-        @if (invoices == null)
+        @if (_invoices == null)
         {
             <p>Loading .... </p>
         }
         else
         {
-            <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationState" ResizableColumns="true" Class="table table-striped" >
+            <QuickGrid Items="_invoices.AsQueryable()" Pagination="_paginationState" ResizableColumns="true" Class="table table-striped" >
 
                     <PropertyColumn Property="@(i=>i.Number)" Sortable="true"></PropertyColumn>
                     <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
@@ -27,7 +27,7 @@
                         <button class="btn btn-dark" @onclick="(e=> EditInvoice(context.Id))">Edit</button>
                     </TemplateColumn>
             </QuickGrid>
-            <Paginator Value="paginationState" />
+            <Paginator Value="_paginationState" />
         }
 
      </ChildContent>
@@ -35,26 +35,26 @@
 
 @code {
 
-    bool isVisible = false;
-    private List<Invoice> invoices = new();
-    PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
+    bool _isVisible = false;
+    private List<Invoice> _invoices = new();
+    PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
     protected override async Task OnInitializedAsync()
     {
-        invoices = await _invoiceService.GetUSerInvoicesAsync();
+        _invoices = await InvoiceService.GetUSerInvoicesAsync();
     }
-    private void EditInvoice(int InvoiceId)
+    private void EditInvoice(int invoiceId)
     {
-        navigationManager.NavigateTo($"invoiceAction/{InvoiceId}");
+        NavigationManager.NavigateTo($"invoiceAction/{invoiceId}");
     }
-    private void ShowInvoiceDetails(int InvoiceId)
+    private void ShowInvoiceDetails(int invoiceId)
     {
-        navigationManager.NavigateTo($"invoice/{InvoiceId}");
+        NavigationManager.NavigateTo($"invoice/{invoiceId}");
     }
-    private async void DeleteInvoice(int InvoiceId)
+    private async void DeleteInvoice(int invoiceId)
     {
-        var invoiceToDelete = await _invoiceService.GetInvoiceByIdAsync(InvoiceId);
-        await _invoiceService.DeleteInvoiceAsync(invoiceToDelete);
-        invoices = await _invoiceService.GetUSerInvoicesAsync();
+        var invoiceToDelete = await InvoiceService.GetInvoiceByIdAsync(invoiceId);
+        await InvoiceService.DeleteInvoiceAsync(invoiceToDelete);
+        _invoices = await InvoiceService.GetUSerInvoicesAsync();
         StateHasChanged();
     }
 }

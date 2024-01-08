@@ -1,7 +1,7 @@
-﻿@inject IItemService service
+﻿@inject IItemService Service
 
 
-@if (isVisible)
+@if (IsVisible)
 {
     <div class="modal modal-dialog-centered modal-dialog-scrollable" tabindex="-1" role="dialog" id="modalChoice" >
         <div class="modal-dialog" role="dialog">
@@ -10,17 +10,17 @@
                         Items List
                 </div>
                 <div class="modal-body p-4 text-center">
-                    @if (items is not null)
+                    @if (Items is not null)
                     {
 
-                        <QuickGrid Items="items.AsQueryable()" Pagination="paginationState" Class="table table-bordered table-striped">
+                        <QuickGrid Items="Items.AsQueryable()" Pagination="_paginationState" Class="table table-bordered table-striped">
                             <PropertyColumn Property="i=>i.Name"></PropertyColumn>
                             <PropertyColumn Property="i=>i.Ean"></PropertyColumn>
                             <TemplateColumn Title="Action">
                                 <button class="btn btn-success" @onclick="(c=> AddItemAction(context.Id))">Add</button>
                             </TemplateColumn>
                         </QuickGrid>
-                        <Paginator Value="paginationState" />
+                        <Paginator Value="_paginationState" />
 
                     }
                 </div>
@@ -34,15 +34,15 @@
 
 @code {
     [Parameter]
-    public bool isVisible { get; set; }
+    public bool IsVisible { get; set; }
     [Parameter]
-    public List<Item> items { get; set; }
+    public List<Item> Items { get; set; }
     [Parameter]
     public EventCallback<MouseEventArgs> OnCLickClose { get; set; }
     [Parameter]
     public EventCallback<int> OnCLickAdd { get; set; }
 
-    PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
+    PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
     private void AddItemAction(int itemId)
     {
         OnCLickAdd.InvokeAsync(itemId);

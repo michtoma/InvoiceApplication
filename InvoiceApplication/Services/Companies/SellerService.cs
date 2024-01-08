@@ -15,19 +15,19 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task CreateSellerAsync(Seller seller)
         {
-            using var _context = _dbContextFactory.CreateDbContext();
-            _context.Sellers.Add(seller);
-            await _context.SaveChangesAsync();
+            using var context = _dbContextFactory.CreateDbContext();
+            context.Sellers.Add(seller);
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteSellerAsync(int sellerId)
         {
-            using var _context = _dbContextFactory.CreateDbContext();
+            using var context = _dbContextFactory.CreateDbContext();
             try
             {
-                var SellerToDelete = await GetSellerByIdAsync(sellerId);
-                _context.Sellers.Remove(SellerToDelete);
-                await _context.SaveChangesAsync();
+                var sellerToDelete = await GetSellerByIdAsync(sellerId);
+                context.Sellers.Remove(sellerToDelete);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -37,10 +37,10 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<Seller> GetSellerByIdAsync(int sellerId)
         {
-            using var _context = _dbContextFactory.CreateDbContext();
+            using var context = _dbContextFactory.CreateDbContext();
             try
             {
-                return await _context.Sellers.Include(s=>s.Address).FirstOrDefaultAsync(s=>s.Id==sellerId);
+                return await context.Sellers.Include(s=>s.Address).FirstOrDefaultAsync(s=>s.Id==sellerId);
             }
             catch (Exception ex)
             {
@@ -52,13 +52,13 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Seller>> GetAllSellersAsync()
         {
-            using var _context = _dbContextFactory.CreateDbContext();
-            return await _context.Sellers.Include(s=>s.User).Include(s=>s.Address).ToListAsync();
+            using var context = _dbContextFactory.CreateDbContext();
+            return await context.Sellers.Include(s=>s.User).Include(s=>s.Address).ToListAsync();
         }
 
         public async Task UpdateSellerAsync(Seller seller)
         {
-            using var _context = _dbContextFactory.CreateDbContext();
+            using var context = _dbContextFactory.CreateDbContext();
             try
             {
                 var existingSeller = await GetSellerByIdAsync(seller.Id);
@@ -72,8 +72,8 @@ namespace InvoiceApplication.Services.Companies
                     existingSeller.IsVatPayer = seller.IsVatPayer;
                     existingSeller.Name = seller.Name;
                     existingSeller.Phone = seller.Phone;
-                    _context.Update(existingSeller);
-                    await _context.SaveChangesAsync();
+                    context.Update(existingSeller);
+                    await context.SaveChangesAsync();
                 }
                 else
                 {

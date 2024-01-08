@@ -1,62 +1,62 @@
-﻿@inject IBuyerService _buyerService
-@inject IAddresService _addressService
-@inject IAppUserService _userService
-@inject NavigationManager _navigationManager
+﻿@inject IBuyerService BuyerService
+@inject IAddresService AddressService
+@inject IAppUserService UserService
+@inject NavigationManager NavigationManager
 @page "/NewBuyer"
 <PageTitle>New Buyer</PageTitle>
 <AuthorizeView>
     <Authorized>
         <h3>New Buyer</h3>
-<EditForm Model="buyer" OnValidSubmit="SubmitForm">
+<EditForm Model="_buyer" OnValidSubmit="SubmitForm">
     <ChildContent Context="buyerContext">
     <DataAnnotationsValidator />
     <div class="row col-10">
         <div class="col-6">
             <label for="name">Name</label>
-            <InputText id="name" @bind-Value="buyer.Name" class="form-control"></InputText>
-            <ValidationMessage For="@(() => buyer.Name)" />
+            <InputText id="name" @bind-Value="_buyer.Name" class="form-control"></InputText>
+            <ValidationMessage For="@(() => _buyer.Name)" />
         </div>
         <div class="col-4">
             <label for="Nip">Nip</label>
-            <InputText id="Nip" @bind-Value="buyer.Nip" class="form-control"></InputText>
-            <ValidationMessage For="@(() => buyer.Nip)" />
+            <InputText id="Nip" @bind-Value="_buyer.Nip" class="form-control"></InputText>
+            <ValidationMessage For="@(() => _buyer.Nip)" />
         </div>
         <div style="display: none;">
             <label for="id">Id</label>
-            <InputNumber id="id" @bind-Value="buyer.Id" class="form-control"></InputNumber>
-            <ValidationMessage For="@(() => buyer.Id)" />
+            <InputNumber id="id" @bind-Value="_buyer.Id" class="form-control"></InputNumber>
+            <ValidationMessage For="@(() => _buyer.Id)" />
         </div>
     </div>
     <div>
-        <EditForm Model="address" OnValidSubmit="SubmitForm">
+        <EditForm Model="_address" OnValidSubmit="SubmitForm">
             <ChildContent Context="addressContext">
                 <DataAnnotationsValidator />
                 <div class="row col-10">
 
                     <div class="col-3">
                         <label for="postalCode">Postal Code</label>
-                        <InputText @bind-Value="address.PostalCode" class="form-control"></InputText>
-                        <ValidationMessage For="@(() => address.PostalCode)" />
+                        <InputText @bind-Value="_address.PostalCode" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => _address.PostalCode)" />
                     </div>
                     <div class="col-7">
                         <label for="city">City</label>
-                        <InputText @bind-Value="address.City" class="form-control"></InputText>
-                        <ValidationMessage For="@(() => address.City)" />
+                        <InputText @bind-Value="_address.City" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => _address.City)" />
                     </div>
                     <div class="col-6">
                         <label for="street">Street</label>
-                        <InputText @bind-Value="address.Street" class="form-control"></InputText>
-                        <ValidationMessage For="@(() => address.Street)" />
+                        <InputText @bind-Value="_address.Street" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => _address.Street)" />
                     </div>
                     <div class="col-2">
                         <label for="streetNumber">Street Number</label>
-                        <InputText @bind-Value="address.StreetNumber" class="form-control"></InputText>
-                        <ValidationMessage For="@(() => address.StreetNumber)" />
+                        <InputText @bind-Value="_address.StreetNumber" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => _address.StreetNumber)" />
                     </div>
                     <div class="col-2">
                         <label for="apartmentNumber">Apartment Number</label>
-                        <InputText @bind-Value="address.ApartmentNumber" class="form-control"></InputText>
-                        <ValidationMessage For="@(() => address.ApartmentNumber)" />
+                        <InputText @bind-Value="_address.ApartmentNumber" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => _address.ApartmentNumber)" />
                     </div>
                 </div>
             </ChildContent>
@@ -65,13 +65,13 @@
 
             <div class="col-3">
                 <label for="Phone">Phone</label>
-                <InputText id="Phone" @bind-Value="buyer.Phone" class="form-control"></InputText>
-                <ValidationMessage For="@(() => buyer.Phone)" />
+                <InputText id="Phone" @bind-Value="_buyer.Phone" class="form-control"></InputText>
+                <ValidationMessage For="@(() => _buyer.Phone)" />
             </div>
             <div class="col-7">
                 <label for="Email">Email</label>
-                <InputText id="Email" @bind-Value="buyer.Email" class="form-control"></InputText>
-                <ValidationMessage For="@(() => buyer.Email)" />
+                <InputText id="Email" @bind-Value="_buyer.Email" class="form-control"></InputText>
+                <ValidationMessage For="@(() => _buyer.Email)" />
             </div>
             <div class="m-3">
                 <button type="submit" class="btn btn-primary">Add new buyer</button>
@@ -87,18 +87,18 @@
     </NotAuthorized>
 </AuthorizeView>
 @code {
-    Buyer buyer = new();
-    Address address = new();
+    Buyer _buyer = new();
+    Address _address = new();
     private async void SubmitForm()
     {
-        var user = await _userService.GetCurrentUser();
-        buyer.SellerId = user.Seller.Id;
-        await _buyerService.CreateBuyerAsync(buyer);
-        address.BuyerId = buyer.Id;
-        await _addressService.CreateAddressAsync(address);
-        buyer.AddressId = address.Id;
-        await _buyerService.UpdateBuyerAsync(buyer);
-        _navigationManager.NavigateTo("/Buyers");
+        var user = await UserService.GetCurrentUser();
+        _buyer.SellerId = user.Seller.Id;
+        await BuyerService.CreateBuyerAsync(_buyer);
+        _address.BuyerId = _buyer.Id;
+        await AddressService.CreateAddressAsync(_address);
+        _buyer.AddressId = _address.Id;
+        await BuyerService.UpdateBuyerAsync(_buyer);
+        NavigationManager.NavigateTo("/Buyers");
         StateHasChanged();
     }
 

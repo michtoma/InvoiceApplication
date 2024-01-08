@@ -1,22 +1,22 @@
 ﻿@page "/Items"
-@inject IItemService service
-@inject IVatRateService vatService
+@inject IItemService Service
+@inject IVatRateService VatService
 
 <PageTitle>Items</PageTitle>
 <div class="container-fluid">
     <h3>Items</h3>
-    <button class="btn btn-outline-success mb-2" @onclick="addNew">Dodaj Nowy</button>
+    <button class="btn btn-outline-success mb-2" @onclick="AddNew">Dodaj Nowy</button>
     <br />
     <div class="row">
-        @if (addNewVisisble)
+        @if (_addNewVisisble)
         {
-            <ItemsOperations itemId="itemId" isVisible="addNewVisisble" OnClickClose="ClickHandler"></ItemsOperations>
+            <ItemsOperations ItemId="_itemId" IsVisible="_addNewVisisble" OnClickClose="ClickHandler"></ItemsOperations>
         }
-        @if (items is null)
+        @if (_items is null)
         {
             <p>        Loading ....    </p>
         }
-        else if (items.Count()==0)
+        else if (_items.Count()==0)
         {
             <p>Look like is nothing to show</p>
         }
@@ -24,7 +24,7 @@
         {
 
             <div>
-                <QuickGrid Items="items.AsQueryable()" Class="table table-striped table-bordered">
+                <QuickGrid Items="_items.AsQueryable()" Class="table table-striped table-bordered">
                     <PropertyColumn Property="@(i => i.Name)" Sortable="true" />
                     <PropertyColumn Property="@(i=>i.Ean)" Sortable="true" />
                     <PropertyColumn Property="@(i=>i.NetPrice)" Format="0.00 zł" Sortable="true" Title="Nett Price" />
@@ -46,45 +46,45 @@
 
 
 @code {
-    private bool addNewVisisble = false;
-    int itemId;
-    Item item = new Item();
-    List<Item> items = new List<Item>();
+    private bool _addNewVisisble = false;
+    int _itemId;
+    Item _item = new Item();
+    List<Item> _items = new List<Item>();
     protected override async Task OnInitializedAsync()
     {
-        items = await service.GetUSerItemsAsync();
-        item = new Item();
+        _items = await Service.GetUSerItemsAsync();
+        _item = new Item();
     }
-    private void addNew()
+    private void AddNew()
     {
-        itemId = 0;
-        item = new Item();
-        addNewVisisble = true;
+        _itemId = 0;
+        _item = new Item();
+        _addNewVisisble = true;
 
     }
-    private async void Edit(int Id)
+    private async void Edit(int id)
     {
-        item = await service.GetItemByIdAsync(Id);
-        itemId = Id;
-        if (item.Id == Id)
+        _item = await Service.GetItemByIdAsync(id);
+        _itemId = id;
+        if (_item.Id == id)
         {
-            addNewVisisble = true;
+            _addNewVisisble = true;
         }
     }
     private async void Delete(int id)
     {
-        item = await service.GetItemByIdAsync(id);
-        if (item.Id == id)
+        _item = await Service.GetItemByIdAsync(id);
+        if (_item.Id == id)
         {
-            await service.DeleteItemAsync(item);
+            await Service.DeleteItemAsync(_item);
             await OnInitializedAsync();
             StateHasChanged();
         }
     }
     private async void ClickHandler()
     {
-        addNewVisisble = false;
-        items = await service.GetUSerItemsAsync();
+        _addNewVisisble = false;
+        _items = await Service.GetUSerItemsAsync();
         StateHasChanged();
     }
 }

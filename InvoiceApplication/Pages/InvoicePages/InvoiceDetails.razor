@@ -1,39 +1,39 @@
 ﻿@page "/invoice/{invoiceId:int?}"
-@inject IInvoiceService service
-@inject IBuyerService _buyerServie
-@inject ISellerService _sellerService
-@inject NavigationManager navigationManager
+@inject IInvoiceService Service
+@inject IBuyerService BuyerServie
+@inject ISellerService SellerService
+@inject NavigationManager NavigationManager
 <PageTitle>Invoice Details</PageTitle>
 <h3>Invoice Details</h3>
-@if (invoice is null)
+@if (_invoice is null)
 {
     <h1>It looks like there's nothing here.</h1>
 }
 else
 {
     <div class="invoice-header">
-        <h4 class="text-end">@invoice.SellerAddress.City, @invoice.CreateDate.ToShortDateString()</h4>
-        <h1 class="text-center">Faktura numer @invoice.Number</h1>
+        <h4 class="text-end">@_invoice.SellerAddress.City, @_invoice.CreateDate.ToShortDateString()</h4>
+        <h1 class="text-center">Faktura numer @_invoice.Number</h1>
 
         <div class="row">
             <div class="col-6">
                 <div class="invoice-header-info">
-                    <div>@seller.Name</div>
-                    <div>@seller.Address.Street @seller.Address.StreetNumber/@seller.Address.ApartmentNumber</div>
-                    <div>@seller.Address.PostalCode @seller.Address.City</div>
-                    <div>NIP: @seller.Nip</div>
-                    <div>Email: @seller.Email</div>
-                    <div>Phone: @seller.Phone</div>
+                    <div>@_seller.Name</div>
+                    <div>@_seller.Address.Street @_seller.Address.StreetNumber/@_seller.Address.ApartmentNumber</div>
+                    <div>@_seller.Address.PostalCode @_seller.Address.City</div>
+                    <div>NIP: @_seller.Nip</div>
+                    <div>Email: @_seller.Email</div>
+                    <div>Phone: @_seller.Phone</div>
                 </div>
             </div>
             <div class="col-6 text-right">
                 <div class="invoice-header-info">
-                    <div>@buyer.Name</div>
-                    <div>@buyer.Address.Street @buyer.Address.StreetNumber/@buyer.Address.ApartmentNumber</div>
-                    <div>@buyer.Address.PostalCode @buyer.Address.City</div>
-                    <div>NIP: @buyer.Nip</div>
-                    <div>Email: @buyer.Email</div>
-                    <div>Phone: @buyer.Phone</div>
+                    <div>@_buyer.Name</div>
+                    <div>@_buyer.Address.Street @_buyer.Address.StreetNumber/@_buyer.Address.ApartmentNumber</div>
+                    <div>@_buyer.Address.PostalCode @_buyer.Address.City</div>
+                    <div>NIP: @_buyer.Nip</div>
+                    <div>Email: @_buyer.Email</div>
+                    <div>Phone: @_buyer.Phone</div>
                 </div>
             </div>
         </div>
@@ -54,9 +54,9 @@ else
                 </tr>
             </thead>
             <tbody>
-                @if (invoice.InvoiceItems.Any())
+                @if (_invoice.InvoiceItems.Any())
                 {
-                    @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
+                    @foreach (var (item, index) in _invoice.InvoiceItems.Select((item, index) => (item, index)))
                     {
                         <tr>
                             <td>@(index + 1)</td>
@@ -79,9 +79,9 @@ else
                     <tr>
                         <td colspan="4"></td>
                         <th>Total:</th>
-                        <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00 zł")</td>
+                        <td>@_invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00 zł")</td>
                         <td>XXX</td>
-                        <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00 zł")</td>
+                        <td>@_invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00 zł")</td>
                     </tr>
                 }
                 else
@@ -95,7 +95,7 @@ else
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="8" class="text-end">Termin płatności: @invoice.PaymentDate.ToShortDateString()</td>
+                    <td colspan="8" class="text-end">Termin płatności: @_invoice.PaymentDate.ToShortDateString()</td>
                 </tr>
             </tfoot>
         </table>
@@ -106,23 +106,23 @@ else
 
 @code {
     [Parameter]
-    public int invoiceId { get; set; }
-    private Invoice invoice;
-    private Buyer buyer;
-    private Seller seller;
+    public int InvoiceId { get; set; }
+    private Invoice _invoice;
+    private Buyer _buyer;
+    private Seller _seller;
 
 
     protected override async Task OnInitializedAsync()
     {
-        if (!(invoiceId == 0))
+        if (!(InvoiceId == 0))
         {
-            invoice = await service.GetInvoiceByIdAsync((int)invoiceId);
-            buyer = await _buyerServie.GetBuyerByIdAsync((int)invoice.BuyerId);
-            seller = await _sellerService.GetSellerByIdAsync((int)invoice.SellerId);
+            _invoice = await Service.GetInvoiceByIdAsync((int)InvoiceId);
+            _buyer = await BuyerServie.GetBuyerByIdAsync((int)_invoice.BuyerId);
+            _seller = await SellerService.GetSellerByIdAsync((int)_invoice.SellerId);
         }
     }
     private void BackToInvoiceList()
     {
-        navigationManager.NavigateTo("/invoices");
+        NavigationManager.NavigateTo("/invoices");
     }
 }

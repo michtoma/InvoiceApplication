@@ -16,8 +16,8 @@ namespace InvoiceApplication.Services.Items
 
         public async Task<List<VatRate>> GetVatRatesAsync()
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
-            return await _context.VatRate.ToListAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.VatRate.ToListAsync();
         }
     }
 }

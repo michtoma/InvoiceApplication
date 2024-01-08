@@ -1,60 +1,61 @@
 ﻿@page "/invoiceAction"
 @page "/invoiceAction/{invoiceId:int?}"
-@inject IInvoiceService _invoiceService
-@inject IItemService _itemService
-@inject IInvoiceItemService _invItemService
-@inject IBuyerService _buyerService
-@inject ISellerService _sellerService
-@inject IAddresService _addressService
-@inject IAppUserService _userService
-@inject INumberGenerator _numberGenerator
-<PageTitle>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
-    <ModalWindow modalMessage="modalModelMessage" onCancel="onCancel" onConfirm="onConfirm" forDelete="toDelete"></ModalWindow>
-    <ModalItemList isVisible="isVisibleItemsModal" items="items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
-    <ModalItemsInvoiceEdit @ref="modalInvItemEdit" OnClickClose="CloseEditInvoiceItem"></ModalItemsInvoiceEdit>
-    <h3>@((invoiceId == null || invoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
-<EditForm Model="invoice" OnValidSubmit="HeaderConirmation">
+@inject IInvoiceService InvoiceService
+@inject IItemService ItemService
+@inject IInvoiceItemService InvItemService
+@inject IBuyerService BuyerService
+@inject ISellerService SellerService
+@inject IAddresService AddressService
+@inject IAppUserService UserService
+@inject INumberGenerator NumberGenerator
+<PageTitle>@((InvoiceId == null || InvoiceId == 0) ? "Add New Invoice" : "Update Invoice")</PageTitle>
+    <ModalWindow ModalMessage="_modalModelMessage" OnCancel="OnCancel" OnConfirm="OnConfirm" ForDelete="_toDelete"></ModalWindow>
+    <ModalItemList IsVisible="_isVisibleItemsModal" Items="_items" OnCLickClose="CloseItemsModal" OnCLickAdd="AddItemFromModalItems"></ModalItemList>
+    <ModalItemsInvoiceEdit @ref="_modalInvItemEdit" OnClickClose="CloseEditInvoiceItem"></ModalItemsInvoiceEdit>
+    <h3>@((InvoiceId == null || InvoiceId == 0) ? "Add New Invoice" : "Update Invoice")</h3>
+<EditForm Model="_invoice" OnValidSubmit="HeaderConirmation">
     <DataAnnotationsValidator />
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="buyer" class="form-label">Buyer</label>
-            <InputSelect id="buyer" class="form-select" ValueExpression="@(()=>invoice.BuyerId)" Value="@invoice.BuyerId" ValueChanged="@((int? args) => { invoice.BuyerId = args; AddressSet(args); })" required>
+            <InputSelect id="buyer" class="form-select" ValueExpression="@(()=>_invoice.BuyerId)" 
+                         Value="@_invoice.BuyerId" ValueChanged="@((int? args) => { _invoice.BuyerId = args; AddressSet(args); })" required>
                 <option value="" selected disabled>Select Company</option>
-                @foreach (var buyer in buyers)
+                @foreach (var buyer in _buyers)
                 {
                     <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
                 }
             </InputSelect>
-            @if (buyerAddress is not null)
+            @if (_buyerAddress is not null)
             {
                 <div class="mt-2">
                     <label class="fw-bold">Buyer Address:</label>
                     <div class="row">
                         <div class="col-md-4">
                             <label for="street" class="form-label">Street:</label>
-                            <input type="text" id="street" name="street" value="@buyerAddress.Street" class="form-control" disabled>
+                            <input type="text" id="street" name="street" value="@_buyerAddress.Street" class="form-control" disabled>
                         </div>
                         <div class="col-md-4">
                             <label for="streetNumber" class="form-label">Street Number:</label>
-                            <input type="text" id="streetNumber" name="streetNumber" value="@buyerAddress.StreetNumber" class="form-control" disabled>
+                            <input type="text" id="streetNumber" name="streetNumber" value="@_buyerAddress.StreetNumber" class="form-control" disabled>
                         </div>
                         <div class="col-md-4">
                             <label for="apartmentNumber" class="form-label">Apartment Number:</label>
-                            <input type="text" id="apartmentNumber" name="apartmentNumber" value="@buyerAddress.ApartmentNumber" class="form-control" disabled>
+                            <input type="text" id="apartmentNumber" name="apartmentNumber" value="@_buyerAddress.ApartmentNumber" class="form-control" disabled>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
                             <label for="postalCode" class="form-label">Postal Code:</label>
-                            <input type="text" id="postalCode" name="postalCode" value="@buyerAddress.PostalCode" class="form-control" disabled>
+                            <input type="text" id="postalCode" name="postalCode" value="@_buyerAddress.PostalCode" class="form-control" disabled>
                         </div>
                         <div class="col-md-4">
                             <label for="city" class="form-label">City:</label>
-                            <input type="text" id="city" name="city" value="@buyerAddress.City" class="form-control" disabled>
+                            <input type="text" id="city" name="city" value="@_buyerAddress.City" class="form-control" disabled>
                         </div>
                         <div class="col-md-4">
                             <label for="country" class="form-label">Country:</label>
-                            <input type="text" id="country" name="country" value="@buyerAddress.Country" class="form-control" disabled>
+                            <input type="text" id="country" name="country" value="@_buyerAddress.Country" class="form-control" disabled>
                         </div>
                     </div>
                 </div>
@@ -62,27 +63,27 @@
         </div>
         <div class="col-md-3">
             <label for="number" class="form-label">Number</label>
-            <InputText id="number" @bind-Value="invoice.Number" class="form-control" disabled></InputText>
-            <ValidationMessage For="@(() => invoice.Number)" />
+            <InputText id="number" @bind-Value="_invoice.Number" class="form-control" disabled></InputText>
+            <ValidationMessage For="@(() => _invoice.Number)" />
         </div>
         <div class="col-md-3">
             <label for="createDate" class="form-label">Create Date</label>
-            <InputDate id="createDate" @bind-Value="invoice.CreateDate" class="form-control" disabled></InputDate>
-            <ValidationMessage For=@(()=>invoice.CreateDate) />
+            <InputDate id="createDate" @bind-Value="_invoice.CreateDate" class="form-control" disabled></InputDate>
+            <ValidationMessage For=@(()=>_invoice.CreateDate) />
         </div>
         <div class="mb-3">
             <label class="fw-bold">Payment Information:</label>
             <div>
                 <label>Number of days of payment deadline: </label>
-                <InputNumber id="days" @bind-Value="invoice.DaysOfPaiment"></InputNumber>
-                <label>Payment deadline: @DateOnly.FromDateTime(invoice.PaymentDate)</label>
+                <InputNumber id="days" @bind-Value="_invoice.DaysOfPaiment"></InputNumber>
+                <label>Payment deadline: @DateOnly.FromDateTime(_invoice.PaymentDate)</label>
             </div>
             <label for="description" class="form-label">Description</label>
-            <InputText id="description" @bind-Value="invoice.Description" class="form-control"></InputText>
-            <ValidationMessage For=@(()=>invoice.Description) />
+            <InputText id="description" @bind-Value="_invoice.Description" class="form-control"></InputText>
+            <ValidationMessage For=@(()=>_invoice.Description) />
         </div>
     </div>
-    <button class="btn btn-success my-2" type="submit">@((invoiceId == null || invoiceId == 0) ? "Save Invoice" : "Update Invoice Header")</button>
+    <button class="btn btn-success my-2" type="submit">@((InvoiceId == null || InvoiceId == 0) ? "Save Invoice" : "Update Invoice Header")</button>
 </EditForm>
 
 <div class="mt-4">
@@ -101,9 +102,9 @@
             </tr>
         </thead>
         <tbody>
-            @if (invoice.InvoiceItems != null)
+            @if (_invoice.InvoiceItems != null)
             {
-                @foreach (var (item, index) in invoice.InvoiceItems.Select((item, index) => (item, index)))
+                @foreach (var (item, index) in _invoice.InvoiceItems.Select((item, index) => (item, index)))
                 {
                     <tr>
                         <td>@(index + 1)</td>
@@ -131,9 +132,9 @@
             <tr>
                 <td colspan="4"></td>
                 <th>Total:</th>
-                <td>@invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
+                <td>@_invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
                 <td>XXX</td>
-                <td>@invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
+                <td>@_invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
                 <td></td>
             </tr>
         </tbody>
@@ -141,196 +142,196 @@
 </div>
 
 <div class="mt-2">
-    @if (!(invoiceId == null || invoiceId == 0))
+    @if (!(InvoiceId == null || InvoiceId == 0))
     {
-        <button class="btn btn-outline-secondary me-2" @onclick="showItemsModal">Add Item to Invoice </button>
+        <button class="btn btn-outline-secondary me-2" @onclick="ShowItemsModal">Add Item to Invoice </button>
     }
-    <a class="btn btn-secondary my-2" href=" Invoices">Back to Invoice List </a>
+    <a class="btn btn-secondary my-2" href="/Invoices">Back to Invoice List </a>
 </div>
 
 @code {
-    bool modalConfirmed = false;
-    bool toDelete = false;
+    bool _modalConfirmed = false;
+    bool _toDelete = false;
     [Parameter]
-    public int? invoiceId { get; set; }
-    ModalMessage modalModelMessage = new();
-    Invoice invoice = new();
-    Buyer buyer = new();
-    List<Item> items = new();
-    List<Buyer> buyers = new();
-    Address buyerAddress = new();
-    ModalItemsInvoiceEdit modalInvItemEdit;
-    bool isVisibleItemsModal = false;
+    public int? InvoiceId { get; set; }
+    ModalMessage _modalModelMessage = new();
+    Invoice _invoice = new();
+    Buyer _buyer = new();
+    List<Item> _items = new();
+    List<Buyer> _buyers = new();
+    Address _buyerAddress = new();
+    ModalItemsInvoiceEdit? _modalInvItemEdit;
+    bool _isVisibleItemsModal = false;
     protected override async Task OnInitializedAsync()
     {
-        items = await _itemService.GetUSerItemsAsync();
-        buyers = await _buyerService.GetUserBuyersAsync();
-        if (!(invoiceId == 0 || invoiceId == null))
+        _items = await ItemService.GetUSerItemsAsync();
+        _buyers = await BuyerService.GetUserBuyersAsync();
+        if (!(InvoiceId == 0 || InvoiceId == null))
         {
-            invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
-            buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
-            buyerAddress = await _addressService.GetAddressByIdAsync(buyer.Address.Id);
+            _invoice = await InvoiceService.GetInvoiceByIdAsync((int)InvoiceId);
+            _buyer = await BuyerService.GetBuyerByIdAsync((int)_invoice.BuyerId);
+            _buyerAddress = await AddressService.GetAddressByIdAsync(_buyer.Address.Id);
         }
         else
         {
-            invoice.Number = await _numberGenerator.GenerateInvoiceNumber(invoice.CreateDate);
+            _invoice.Number = await NumberGenerator.GenerateInvoiceNumber(_invoice.CreateDate);
         }
     }
     async void AddressSet(int? i)
     {
-        buyerAddress = new();
-        if (invoice.BuyerId is not null) buyer = await _buyerService.GetBuyerByIdAsync((int)invoice.BuyerId);
-        if (invoice.BuyerId is not null) buyerAddress = await _addressService.GetAddressByIdAsync(buyer.Address.Id);
+        _buyerAddress = new();
+        if (_invoice.BuyerId is not null) _buyer = await BuyerService.GetBuyerByIdAsync((int)_invoice.BuyerId);
+        if (_invoice.BuyerId is not null) _buyerAddress = await AddressService.GetAddressByIdAsync(_buyer.Address.Id);
         StateHasChanged();
     }
     void HeaderConirmation()
     {
-        if (invoiceId == null || invoiceId == 0)
+        if (InvoiceId == null || InvoiceId == 0)
         {
-            modalModelMessage.Body = "Are you sure to add a new invoice " + invoice.Number;
-            modalModelMessage.Title = "Confirm:";
+            _modalModelMessage.Body = "Are you sure to add a new invoice " + _invoice.Number;
+            _modalModelMessage.Title = "Confirm:";
 
         }
         else
         {
-            modalModelMessage.Body = "Are you sure you want to modify the invoice header " + invoice.Number;
-            modalModelMessage.Title = "Confirm:";
+            _modalModelMessage.Body = "Are you sure you want to modify the invoice header " + _invoice.Number;
+            _modalModelMessage.Title = "Confirm:";
 
         }
-        modalModelMessage.Type = ModalType.Confirm;
-        modalModelMessage.isVisible = true;
+        _modalModelMessage.Type = ModalType.Confirm;
+        _modalModelMessage.IsVisible = true;
 
     }
     void ConfirmInvoice()
     {
-        modalModelMessage.Body = "Are you sure to add the item to the invoice " + invoice.Number + "?";
-        modalModelMessage.Title = "Confirm:";
-        modalModelMessage.Type = ModalType.Confirm;
-        modalModelMessage.isVisible = true;
+        _modalModelMessage.Body = "Are you sure to add the item to the invoice " + _invoice.Number + "?";
+        _modalModelMessage.Title = "Confirm:";
+        _modalModelMessage.Type = ModalType.Confirm;
+        _modalModelMessage.IsVisible = true;
 
     }
-    private async void onConfirm(MouseEventArgs e)
+    private async void OnConfirm(MouseEventArgs e)
     {
-        modalConfirmed = true;
-        if (modalModelMessage.idToDelte != null)
+        _modalConfirmed = true;
+        if (_modalModelMessage.IdToDelte != null)
         {
             DeleteInvoiceItemConfirmed();
 
         }
-        else if (await _invoiceService.InvoiceExist(invoice.Id))
+        else if (await InvoiceService.InvoiceExist(_invoice.Id))
         {
-            await _invoiceService.UpdateInvoiceAsync(invoice);
-            modalModelMessage.Type = ModalType.Success;
-            modalModelMessage.Title = "Succes";
-            modalModelMessage.Body = "Saved";
-            modalModelMessage.isVisible = true;
+            await InvoiceService.UpdateInvoiceAsync(_invoice);
+            _modalModelMessage.Type = ModalType.Success;
+            _modalModelMessage.Title = "Succes";
+            _modalModelMessage.Body = "Saved";
+            _modalModelMessage.IsVisible = true;
         }
         else
         {
-            var user = await _userService.GetCurrentUser();
-            invoice.AppUserId = user.Id;
-            invoice.SellerId = user.Seller.Id;
-            invoice.SellerAddressId = user.Seller.AddressId;
-            await _invoiceService.AddInvoiceAsync(invoice);
-            invoiceId = invoice.Id;
-            modalModelMessage.Type = ModalType.Success;
-            modalModelMessage.Title = "Succes";
-            modalModelMessage.Body = "Saved";
-            modalModelMessage.isVisible = true;
+            var user = await UserService.GetCurrentUser();
+            _invoice.AppUserId = user.Id;
+            _invoice.SellerId = user.Seller.Id;
+            _invoice.SellerAddressId = user.Seller.AddressId;
+            await InvoiceService.AddInvoiceAsync(_invoice);
+            InvoiceId = _invoice.Id;
+            _modalModelMessage.Type = ModalType.Success;
+            _modalModelMessage.Title = "Succes";
+            _modalModelMessage.Body = "Saved";
+            _modalModelMessage.IsVisible = true;
         }
         StateHasChanged();
 
 
     }
-    private async void AddItemFromModalItems(int ItemId)
+    private async void AddItemFromModalItems(int itemId)
     {
         InvoiceItems invoiceItem = new();
-        var selectedItem = items.FirstOrDefault(i => i.Id == ItemId);
+        var selectedItem = _items.FirstOrDefault(i => i.Id == itemId);
         invoiceItem.ItemId = selectedItem.Id;
         invoiceItem.VatRate = selectedItem.VatRate.Rate;
-        invoiceItem.InvoiceId = invoice.Id;
-        await _invItemService.AddInvoiceItemAsync(invoiceItem);
-        isVisibleItemsModal = false;
-        modalModelMessage.Type = ModalType.Success;
-        modalModelMessage.Title = "Success";
-        modalModelMessage.Body = "The item has been successfully added to the invoice";
-        modalModelMessage.isVisible = true;
+        invoiceItem.InvoiceId = _invoice.Id;
+        await InvItemService.AddInvoiceItemAsync(invoiceItem);
+        _isVisibleItemsModal = false;
+        _modalModelMessage.Type = ModalType.Success;
+        _modalModelMessage.Title = "Success";
+        _modalModelMessage.Body = "The item has been successfully added to the invoice";
+        _modalModelMessage.IsVisible = true;
         StateHasChanged();
         await OnInitializedAsync();
     }
     private async void EditInvoiceItem(int invoiceItemId)
     {
-        modalInvItemEdit.item = await _invItemService.GetInvoiceItemByIdAsync(invoiceItemId);
-        modalInvItemEdit.isVisible = true;
-        modalInvItemEdit.wasEdited = false;
+        _modalInvItemEdit.Item = await InvItemService.GetInvoiceItemByIdAsync(invoiceItemId);
+        _modalInvItemEdit.IsVisible = true;
+        _modalInvItemEdit.WasEdited = false;
         StateHasChanged();
        
     }
     private async void CloseEditInvoiceItem()
     {
-        if (modalInvItemEdit.wasEdited)
+        if (_modalInvItemEdit.WasEdited)
         {
-            modalInvItemEdit.isVisible = false;
-            modalModelMessage.Body = "The invoice item has been updated";
-            modalModelMessage.Title = "Success";
-            modalModelMessage.Type = ModalType.Success;
-            modalModelMessage.isVisible = true;
+            _modalInvItemEdit.IsVisible = false;
+            _modalModelMessage.Body = "The invoice item has been updated";
+            _modalModelMessage.Title = "Success";
+            _modalModelMessage.Type = ModalType.Success;
+            _modalModelMessage.IsVisible = true;
             StateHasChanged();
             await OnInitializedAsync();
 
         }
         else
         {
-            modalInvItemEdit.isVisible = false;
+            _modalInvItemEdit.IsVisible = false;
             StateHasChanged();
         }
     }
     private async void DeleteInvoiceItem(int invoiceItemId)
     {
-        var invoiceItemToDelete = await _invItemService.GetInvoiceItemByIdAsync(invoiceItemId);
-        modalModelMessage.Type = ModalType.Danger;
-        modalModelMessage.Title = "Warrning";
-        modalModelMessage.Body = $"Do you realy want delete {invoiceItemToDelete.Item.Name} ???";
-        modalModelMessage.isVisible = true;
-        modalModelMessage.idToDelte = invoiceItemId;
+        var invoiceItemToDelete = await InvItemService.GetInvoiceItemByIdAsync(invoiceItemId);
+        _modalModelMessage.Type = ModalType.Danger;
+        _modalModelMessage.Title = "Warrning";
+        _modalModelMessage.Body = $"Do you realy want delete {invoiceItemToDelete.Item.Name} ???";
+        _modalModelMessage.IsVisible = true;
+        _modalModelMessage.IdToDelte = invoiceItemId;
         StateHasChanged();
 
     }
     private async void DeleteInvoiceItemConfirmed()
     {
-        if (modalModelMessage.idToDelte == null || modalModelMessage.idToDelte == 0)
+        if (_modalModelMessage.IdToDelte == null || _modalModelMessage.IdToDelte == 0)
         {
-            modalModelMessage.Type = ModalType.Error;
-            modalModelMessage.Title = "Something went wrong";
-            modalModelMessage.Body = "The item has not been deleted from the invoice";
-            modalModelMessage.isVisible = true;
+            _modalModelMessage.Type = ModalType.Error;
+            _modalModelMessage.Title = "Something went wrong";
+            _modalModelMessage.Body = "The item has not been deleted from the invoice";
+            _modalModelMessage.IsVisible = true;
             StateHasChanged();
 
         }
         else
         {
-            await _invItemService.DeleteInvoiceItemByIdAsync((int)modalModelMessage.idToDelte);
-            modalModelMessage.idToDelte = null;
-            modalModelMessage.Type = ModalType.Success;
-            modalModelMessage.Title = "Success";
-            modalModelMessage.Body = "The item has been successfully deleted from the invoice";
-            modalModelMessage.isVisible = true;
-            invoice = await _invoiceService.GetInvoiceByIdAsync((int)invoiceId);
+            await InvItemService.DeleteInvoiceItemByIdAsync((int)_modalModelMessage.IdToDelte);
+            _modalModelMessage.IdToDelte = null;
+            _modalModelMessage.Type = ModalType.Success;
+            _modalModelMessage.Title = "Success";
+            _modalModelMessage.Body = "The item has been successfully deleted from the invoice";
+            _modalModelMessage.IsVisible = true;
+            _invoice = await InvoiceService.GetInvoiceByIdAsync((int)InvoiceId);
             StateHasChanged();
         }
 
     }
-    private void showItemsModal()
+    private void ShowItemsModal()
     {
-        isVisibleItemsModal = true;
+        _isVisibleItemsModal = true;
     }
     private void CloseItemsModal()
     {
-        isVisibleItemsModal = false;
+        _isVisibleItemsModal = false;
     }
-    private async void onCancel(MouseEventArgs e)
+    private async void OnCancel(MouseEventArgs e)
     {
-        modalModelMessage = new();
+        _modalModelMessage = new();
         StateHasChanged();
 
     }

@@ -2,15 +2,15 @@
 @using InvoiceApplication.Models.Companies;
 @using Microsoft.AspNetCore.Identity
 @attribute [IgnoreAntiforgeryToken]
-@inject SignInManager<AppUser> signInManager
+@inject SignInManager<AppUser> SignInManager
 
 
 @functions{
     public async Task<IActionResult> OnPost()
     {
-        if (signInManager.IsSignedIn(User))
+        if (SignInManager.IsSignedIn(User))
         {
-            await signInManager.SignOutAsync();
+            await SignInManager.SignOutAsync();
             
         }
             return Redirect("/");

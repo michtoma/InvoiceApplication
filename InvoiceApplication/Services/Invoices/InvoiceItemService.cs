@@ -16,11 +16,11 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task AddInvoiceItemAsync(InvoiceItems invoiceItem)
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
             try
             {
-                await _context.AddAsync(invoiceItem);
-                await _context.SaveChangesAsync();
+                await context.AddAsync(invoiceItem);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -30,12 +30,12 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task DeleteInvoiceItemByIdAsync(int invoicesItemId)
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
             var invoiceItemToDelete = await GetInvoiceItemByIdAsync(invoicesItemId);
             try
             {
-                _context.Remove(invoiceItemToDelete);
-                await _context.SaveChangesAsync();
+                context.Remove(invoiceItemToDelete);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -46,16 +46,16 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task<List<InvoiceItems>> GetAllInvoiceItemsAsync()
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
-            return await _context.InvoiceItems.Include(i => i.Item).ToListAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.InvoiceItems.Include(i => i.Item).ToListAsync();
         }
 
         public async Task<InvoiceItems> GetInvoiceItemByIdAsync(int invoiceItemId)
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
             try
             {
-                return await _context.InvoiceItems.Include(i=>i.Item).FirstOrDefaultAsync(i=>i.Id==invoiceItemId);
+                return await context.InvoiceItems.Include(i=>i.Item).FirstOrDefaultAsync(i=>i.Id==invoiceItemId);
             }
             catch (Exception ex)
             {
@@ -66,10 +66,10 @@ namespace InvoiceApplication.Services.Invoices
 
         public async Task UpdateInvoiceItemAsync(InvoiceItems invoiceItem)
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
             try
             {
-                var existingInvoiceItem = await _context.InvoiceItems.FindAsync(invoiceItem.Id);
+                var existingInvoiceItem = await context.InvoiceItems.FindAsync(invoiceItem.Id);
 
                 if (existingInvoiceItem != null)
                 {
@@ -79,7 +79,7 @@ namespace InvoiceApplication.Services.Invoices
                     existingInvoiceItem.NetPrice = invoiceItem.NetPrice;
                     existingInvoiceItem.VatRate = invoiceItem.VatRate;
                     existingInvoiceItem.Description = invoiceItem.Description;
-                    await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                 }
                 else
                 {

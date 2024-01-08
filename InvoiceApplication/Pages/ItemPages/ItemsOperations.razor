@@ -1,8 +1,8 @@
-﻿@inject IItemService itemService
-@inject IVatRateService vatService
-@inject IUnitOfMeasureService measurService
-@inject IAppUserService userService
-@if (isVisible)
+﻿@inject IItemService ItemService
+@inject IVatRateService VatService
+@inject IUnitOfMeasureService MeasurService
+@inject IAppUserService UserService
+@if (IsVisible)
 {
     <div class="modal modal-dialog-centered" tabindex="-1" role="dialog" id="modalChoice">
         <div class="modal-dialog" role="dialog">
@@ -10,41 +10,41 @@
                 <div class="modal-body p-4 text-center">
                     <h5 class="mb-0">Items Operations</h5>
 
-                    <EditForm Model="item" OnValidSubmit="SubmitForm">
+                    <EditForm Model="_item" OnValidSubmit="SubmitForm">
                         <DataAnnotationsValidator />
                         <div class="row">
                             <div style="display: none;">
                                 <label for="id">Id</label>
-                                <InputNumber id="id" @bind-Value="item.Id" class="form-control"></InputNumber>
-                                <ValidationMessage For="@(() => item.Id)" />
+                                <InputNumber id="id" @bind-Value="_item.Id" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => _item.Id)" />
                             </div>
                             <div class="col-4">
                                 <label for="ean">Ean</label>
-                                <InputText id="ean" @bind-Value="item.Ean" class="form-control"></InputText>
-                                <ValidationMessage For="@(() => item.Ean)" />
+                                <InputText id="ean" @bind-Value="_item.Ean" class="form-control"></InputText>
+                                <ValidationMessage For="@(() => _item.Ean)" />
                             </div>
                             <div class="col-8">
                                 <label for="name">Name</label>
-                                <InputText id="name" @bind-Value="item.Name" class="form-control"></InputText>
-                                <ValidationMessage For="@(() => item.Name)" />
+                                <InputText id="name" @bind-Value="_item.Name" class="form-control"></InputText>
+                                <ValidationMessage For="@(() => _item.Name)" />
                             </div>
                         </div>
                         <div>
                             <label for="description">Description</label>
-                            <InputText id="description" @bind-Value="item.Description" class="form-control"></InputText>
-                            <ValidationMessage For="@(() => item.Description)" />
+                            <InputText id="description" @bind-Value="_item.Description" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => _item.Description)" />
                         </div>
                         <div>
                             <label for="comments">Comments</label>
-                            <InputText id="comments" @bind-Value="item.Comments" class="form-control"></InputText>
-                            <ValidationMessage For="@(() => item.Comments)" />
+                            <InputText id="comments" @bind-Value="_item.Comments" class="form-control"></InputText>
+                            <ValidationMessage For="@(() => _item.Comments)" />
                         </div>
                         <div class="row">
 
                             <div class="col-6">
                                 <label for="vatRate">VatRate</label>
-                                <InputSelect id="vatRate" @bind-Value="item.VatRateID" class="form-control">
-                                    @foreach (var vatRate in vatRates)
+                                <InputSelect id="vatRate" @bind-Value="_item.VatRateId" class="form-control">
+                                    @foreach (var vatRate in _vatRates)
                                     {
                                         <option value="@vatRate.Id">@vatRate.Rate</option>
                                     }
@@ -53,8 +53,8 @@
 
                             <div class="col-6">
                                 <label for="unitOfMeasure">Unit of Measure</label>
-                                <InputSelect id="unitOfMeasure" @bind-Value="item.UnitOfMeasureId" class="form-control">
-                                    @foreach (var unitOfMeasure in unitOfMeasures)
+                                <InputSelect id="unitOfMeasure" @bind-Value="_item.UnitOfMeasureId" class="form-control">
+                                    @foreach (var unitOfMeasure in _unitOfMeasures)
                                     {
                                         <option value="@unitOfMeasure.Id">@unitOfMeasure.Name</option>
                                     }
@@ -62,18 +62,18 @@
                             </div>
                             <div class="col-6">
                                 <label for="netPrice">NetPrice</label>
-                                <InputNumber id="netPrice" @bind-Value="item.NetPrice" class="form-control"></InputNumber>
-                                <ValidationMessage For="@(() => item.NetPrice)" />
+                                <InputNumber id="netPrice" @bind-Value="_item.NetPrice" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => _item.NetPrice)" />
                             </div>
                             <div class="col-6 ">
                                 <label for="quantity">Quantity</label>
-                                <InputNumber id="quantity" @bind-Value="item.Quantity" class="form-control"></InputNumber>
-                                <ValidationMessage For="@(() => item.Quantity)" />
+                                <InputNumber id="quantity" @bind-Value="_item.Quantity" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => _item.Quantity)" />
                             </div>
 
                         </div>
                         <div class="m-3">
-                            <button type="submit" class="btn btn-primary">@(isNew ? "Create Item" : "Update Item")</button>
+                            <button type="submit" class="btn btn-primary">@(_isNew ? "Create Item" : "Update Item")</button>
                             <button class="btn btn-dark" @onclick="Close">Close</button>
                         </div>
                     </EditForm>
@@ -84,51 +84,51 @@
 }
 
 @code {
-    List<UnitOfMeasure> unitOfMeasures = new List<UnitOfMeasure>();
-    List<VatRate> vatRates = new List<VatRate>();
+    List<UnitOfMeasure> _unitOfMeasures = new List<UnitOfMeasure>();
+    List<VatRate> _vatRates = new List<VatRate>();
     [Parameter]
     public EventCallback OnClickClose { get; set; }
     [Parameter]
-    public int? itemId { get; set; }
+    public int? ItemId { get; set; }
     [Parameter]
-    public bool isVisible { get; set; }
-    Item item = new Item();
-    bool isNew = true;
+    public bool IsVisible { get; set; }
+    Item _item = new Item();
+    bool _isNew = true;
     protected override async Task OnParametersSetAsync()
     {
-        vatRates = await vatService.GetVatRatesAsync();
-        unitOfMeasures = await measurService.GetAllMeasureAsync();
-        if (itemId != 0)
+        _vatRates = await VatService.GetVatRatesAsync();
+        _unitOfMeasures = await MeasurService.GetAllMeasureAsync();
+        if (ItemId != 0)
         {
-            item = await itemService.GetItemByIdAsync((int)itemId);
-            isNew = false;
+            _item = await ItemService.GetItemByIdAsync((int)ItemId);
+            _isNew = false;
         }
         else
         {
-            item = new Item();
-            isNew = true;
+            _item = new Item();
+            _isNew = true;
         }
 
     }
 
     private async void SubmitForm()
     {
-        if (isNew)
+        if (_isNew)
         {
-            var user = await userService.GetCurrentUser();
-            item.SellerId = user.Seller.Id;
-            await itemService.AddNewItemAsync(item);
+            var user = await UserService.GetCurrentUser();
+            _item.SellerId = user.Seller.Id;
+            await ItemService.AddNewItemAsync(_item);
             Close();
         }
         else
         {
-            await itemService.UpdateItemAsync(item);
+            await ItemService.UpdateItemAsync(_item);
             Close();
         }
     }
     private async void Close()
     {
-        isVisible = false;
+        IsVisible = false;
         await OnClickClose.InvokeAsync();
 
     }

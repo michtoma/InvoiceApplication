@@ -18,8 +18,8 @@ namespace InvoiceApplication.Services.Companies
         }
         public async Task<List<AppUser>> GetAll()
         {
-            using var _context = await _contextFactory.CreateDbContextAsync();
-            return await _context.AppUsers.Include(u => u.Buyers).Include(u => u.Seller).ToListAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.AppUsers.Include(u => u.Buyers).Include(u => u.Seller).ToListAsync();
         }
 
         public async Task<string> GetLoggedUserId()

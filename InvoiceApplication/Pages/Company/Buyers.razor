@@ -1,20 +1,20 @@
 ﻿@page "/buyers"
-@inject IBuyerService _buyerService
+@inject IBuyerService BuyerService
 <h3>Buyers</h3>
-@if (buyers is null)
+@if (_buyers is null)
 {
     <p>
         Loading ...
     </p>
 }
-else if (buyers.Count() == 0)
+else if (_buyers.Count() == 0)
 {
     <p>Looks like there's nothing here</p>
 }
 else
 {
 
-    <QuickGrid Items="buyers.AsQueryable()">
+    <QuickGrid Items="_buyers.AsQueryable()">
         <PropertyColumn Property="@(b=>b.Nip)" Sortable="true"></PropertyColumn>
         <PropertyColumn Property="@(b=>b.Name)" Sortable="true"></PropertyColumn>
         <PropertyColumn Property="@(b=>b.Address.City)" Sortable="true"></PropertyColumn>
@@ -30,10 +30,10 @@ else
 <a class="btn btn-primary" href="newbuyer">Add New</a>
 
 @code {
-    List<Buyer> buyers = new();
+    List<Buyer> _buyers = new();
     protected override async Task OnInitializedAsync()
     {
-        buyers =await _buyerService.GetUserBuyersAsync();
+        _buyers =await BuyerService.GetUserBuyersAsync();
     }
 
 

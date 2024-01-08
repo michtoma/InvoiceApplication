@@ -1,45 +1,45 @@
 ﻿@using Microsoft.AspNetCore.Components.Web;
 
-@if (modalMessage.isVisible)
+@if (ModalMessage.IsVisible)
 {
     <div class="modal modal-dialog-centered" tabindex="-1" role="dialog" id="modalChoice">
         <div class="modal-dialog" role="document">
             <div class="modal-content rounded-3 shadow">
                 <div class="modal-body p-4 text-center">
-                    @if (modalMessage.Type == ModalType.Success)
+                    @if (ModalMessage.Type == ModalType.Success)
                     {
-                        <h5 class="mb-0 text-success">@modalMessage.Title</h5>
+                        <h5 class="mb-0 text-success">@ModalMessage.Title</h5>
 
                     }
-                    else if (modalMessage.Type == ModalType.Error)
+                    else if (ModalMessage.Type == ModalType.Error)
                     {
-                        <h5 class="mb-0 text-danger">@modalMessage.Title</h5>
+                        <h5 class="mb-0 text-danger">@ModalMessage.Title</h5>
 
                     }
-                    else if (modalMessage.Type == ModalType.Danger)
+                    else if (ModalMessage.Type == ModalType.Danger)
                     {
-                        <h5 class="mb-0 text-danger">@modalMessage.Title</h5>
+                        <h5 class="mb-0 text-danger">@ModalMessage.Title</h5>
 
                     }
                     else
                     {
-                        <h5 class="mb-0">@modalMessage.Title</h5>
+                        <h5 class="mb-0">@ModalMessage.Title</h5>
                     }
 
-                    <p class="mb-0">@modalMessage.Body</p>
+                    <p class="mb-0">@ModalMessage.Body</p>
                 </div>
-                @if (modalMessage.Type == ModalType.Confirm)
+                @if (ModalMessage.Type == ModalType.Confirm)
                 {
                     <div class="modal-footer flex-nowrap p-0">
-                        <button type="button" class="btn btn-success rounded-0 border-end" @onclick="onConfirm"><strong>Yes, confirm</strong></button>
-                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">No thanks</button>
+                        <button type="button" class="btn btn-success rounded-0 border-end" @onclick="OnConfirm"><strong>Yes, confirm</strong></button>
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="OnCancel">No thanks</button>
                     </div>
                 }
-                else if (modalMessage.Type == ModalType.Danger)
+                else if (ModalMessage.Type == ModalType.Danger)
                 {
                     <div class="modal-footer flex-nowrap p-0">
-                        <button type="button" class="btn btn-success rounded-0 border-end" @onclick="onConfirmDelete"><strong>Yes, confirm</strong></button>
-                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">No thanks</button>
+                        <button type="button" class="btn btn-success rounded-0 border-end" @onclick="OnConfirmDelete"><strong>Yes, confirm</strong></button>
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="OnCancel">No thanks</button>
                     </div>
 
                 }
@@ -47,7 +47,7 @@
                 {
 
                     <div class="modal-footer flex-nowrap p-0">
-                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="onCancel">Close</button>
+                        <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal" @onclick="OnCancel">Close</button>
                     </div>
                 }
 
@@ -60,17 +60,17 @@
 
 @code {
     [Parameter]
-    public ModalMessage modalMessage { get; set; }
+    public ModalMessage ModalMessage { get; set; }
     [Parameter]
-    public bool? forDelete { get; set; }
+    public bool? ForDelete { get; set; }
     [Parameter]
-    public EventCallback<MouseEventArgs> onConfirm { get; set; }
+    public EventCallback<MouseEventArgs> OnConfirm { get; set; }
     [Parameter]
-    public EventCallback<MouseEventArgs> onCancel { get; set; }
-    private async void onConfirmDelete()
+    public EventCallback<MouseEventArgs> OnCancel { get; set; }
+    private async void OnConfirmDelete()
     {
-        forDelete = true;
-        await onConfirm.InvokeAsync();
+        ForDelete = true;
+        await OnConfirm.InvokeAsync();
     }
 
 }

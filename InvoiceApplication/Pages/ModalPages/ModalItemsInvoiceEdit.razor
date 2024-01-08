@@ -1,7 +1,7 @@
-﻿@inject IInvoiceItemService invItemService
-@inject IVatRateService vatService
-@inject IUnitOfMeasureService measurService
-@if (isVisible)
+﻿@inject IInvoiceItemService InvItemService
+@inject IVatRateService VatService
+@inject IUnitOfMeasureService MeasurService
+@if (IsVisible)
 {
     <div class="modal modal-dialog-centered" tabindex="-1" role="dialog" id="modalChoice">
         <div class="modal-dialog" role="dialog">
@@ -9,37 +9,37 @@
                 <div class="modal-body p-4 text-center">
                     <h5 class="mb-0">Items Operations</h5>
 
-                    <EditForm Model="item" OnValidSubmit="SubmitForm">
+                    <EditForm Model="Item" OnValidSubmit="SubmitForm">
                         <DataAnnotationsValidator />
                         <div class="row">
                             <div style="display: none;">
                                 <label for="id">Id</label>
-                                <InputNumber id="id" @bind-Value="item.Id" class="form-control"></InputNumber>
-                                <ValidationMessage For="@(() => item.Id)" />
+                                <InputNumber id="id" @bind-Value="Item.Id" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => Item.Id)" />
                             </div>
                             <div class="col-8">
                                 <label for="name">Name</label>
-                                <InputText id="name" @bind-Value="item.Item.Name" class="form-control"></InputText>
-                                <ValidationMessage For="@(() => item.Item.Name)" />
+                                <InputText id="name" @bind-Value="Item.Item.Name" class="form-control"></InputText>
+                                <ValidationMessage For="@(() => Item.Item.Name)" />
                             </div>
                         </div>
                         <div>
                             <label for="description">Description</label>
-                            <InputTextArea id="description" @bind-Value="item.Description" class="form-control"></InputTextArea>
-                            <ValidationMessage For="@(() => item.Description)" />
+                            <InputTextArea id="description" @bind-Value="Item.Description" class="form-control"></InputTextArea>
+                            <ValidationMessage For="@(() => Item.Description)" />
                         </div>
                         <div class="row">
 
 
                             <div class="col-6">
                                 <label for="netPrice">NetPrice</label>
-                                <InputNumber id="netPrice" @bind-Value="item.NetPrice" class="form-control"></InputNumber>
-                                <ValidationMessage For="@(() => item.NetPrice)" />
+                                <InputNumber id="netPrice" @bind-Value="Item.NetPrice" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => Item.NetPrice)" />
                             </div>
                             <div class="col-6 ">
                                 <label for="quantity">Quantity</label>
-                                <InputNumber id="quantity" @bind-Value="item.Quantity" class="form-control"></InputNumber>
-                                <ValidationMessage For="@(() => item.Quantity)" />
+                                <InputNumber id="quantity" @bind-Value="Item.Quantity" class="form-control"></InputNumber>
+                                <ValidationMessage For="@(() => Item.Quantity)" />
                             </div>
 
                         </div>
@@ -58,23 +58,23 @@
     [Parameter]
     public EventCallback<MouseEventArgs> OnClickClose { get; set; }
     [Parameter]
-    public InvoiceItems item { get; set; }
+    public InvoiceItems Item { get; set; }
     [Parameter]
-    public bool isVisible { get; set; }
+    public bool IsVisible { get; set; }
     [Parameter]
-    public bool wasEdited { get; set; }
-    bool isNew = true;
+    public bool WasEdited { get; set; }
+    bool _isNew = true;
     private async void SubmitForm()
     {
 
-        await invItemService.UpdateInvoiceItemAsync(item);
-        wasEdited = true;
+        await InvItemService.UpdateInvoiceItemAsync(Item);
+        WasEdited = true;
         Close();
 
     }
     private async void Close()
     {
-        isVisible = false;
+        IsVisible = false;
         await OnClickClose.InvokeAsync();
 
     }

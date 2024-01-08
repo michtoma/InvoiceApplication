@@ -16,7 +16,7 @@ namespace InvoiceApplication.Models.Items
         public double NetPrice { get; set; } = 0;
         public double Quantity { get; set; } = 0;
         public VatRate? VatRate { get; set; }
-        public int VatRateID { get; set; } = 1;
+        public int VatRateId { get; set; } = 1;
         public UnitOfMeasure? UnitOfMeasure { get; set; }
         public int UnitOfMeasureId { get; set; } = 1;
         public Seller Seller { get; set; }

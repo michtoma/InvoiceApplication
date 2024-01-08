@@ -16,19 +16,19 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task CreateAddressAsync(Address address)
         {
-            using var _context = _contextFactoy.CreateDbContext();
-            _context.Addresses.Add(address);
-            await _context.SaveChangesAsync();
+            using var context = _contextFactoy.CreateDbContext();
+            context.Addresses.Add(address);
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteAddressAsync(int addressId)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
             try
             {
                 var addressToDelete = await GetAddressByIdAsync(addressId);
-                _context.Addresses.Remove(addressToDelete);
-                await _context.SaveChangesAsync();
+                context.Addresses.Remove(addressToDelete);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -38,16 +38,16 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Address>> GetAddressByBuyerIdAsync(int companyId)
         {
-            using var _context = _contextFactoy.CreateDbContext();
-            return await _context.Addresses.Where(a=>a.BuyerId == companyId).ToListAsync();
+            using var context = _contextFactoy.CreateDbContext();
+            return await context.Addresses.Where(a=>a.BuyerId == companyId).ToListAsync();
         }
 
         public async Task<Address> GetAddressByIdAsync(int addressId)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
             try
             {
-                return await _context.Addresses.FindAsync(addressId);
+                return await context.Addresses.FindAsync(addressId);
             }
             catch (Exception ex)
             {
@@ -59,13 +59,13 @@ namespace InvoiceApplication.Services.Companies
 
         public async Task<List<Address>> GetAllAddressesAsync()
         {
-            using var _context = _contextFactoy.CreateDbContext();
-            return await _context.Addresses.ToListAsync();
+            using var context = _contextFactoy.CreateDbContext();
+            return await context.Addresses.ToListAsync();
         }
 
         public async Task UpdateAddressAsync(Address address)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
             try
             {
                 var existingAddress = await GetAddressByIdAsync(address.Id);
@@ -79,8 +79,8 @@ namespace InvoiceApplication.Services.Companies
                     existingAddress.SellerId = address.SellerId;
                     existingAddress.Country = address.Country;
                     existingAddress.IsActive = address.IsActive;
-                    _context.Update(existingAddress);
-                    await _context.SaveChangesAsync();
+                    context.Update(existingAddress);
+                    await context.SaveChangesAsync();
                 }
                 else
                 {

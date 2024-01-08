@@ -1,12 +1,12 @@
 ﻿@page "/"
-@inject ISellerService _sellerservice
-@inject IAppUserService _userService
-@inject AuthenticationStateProvider _auth
+@inject ISellerService Sellerservice
+@inject IAppUserService UserService
+@inject AuthenticationStateProvider Auth
 
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
-    <h1>Hello @user.FirstName @user.LastName</h1>
-    @if (seller is null)
+    <h1>Hello @_user.FirstName @_user.LastName</h1>
+    @if (_seller is null)
     {
         <p>You didn't set your company, without that you can't create new invoice.</p>
         <p>Please do that:</p>
@@ -21,50 +21,50 @@
                 <tbody>
                     <tr>
                         <th scope="row">Name</th>
-                        <td>@seller.Name</td>
+                        <td>@_seller.Name</td>
                     </tr>
                     <tr>
                         <th scope="row">Nip</th>
-                        <td>@seller.Nip</td>
+                        <td>@_seller.Nip</td>
                     </tr>
                     <tr class="d-none">
                         <th scope="row">Id</th>
-                        <td>@seller.Id</td>
+                        <td>@_seller.Id</td>
                     </tr>
-                    @if (!(seller.Address is null))
+                    @if (!(_seller.Address is null))
                     {
                         <tr>
                             <th scope="row">Postal Code</th>
-                            <td>@seller.Address.PostalCode</td>
+                            <td>@_seller.Address.PostalCode</td>
                         </tr>
                         <tr>
                             <th scope="row">City</th>
-                            <td>@seller.Address.City</td>
+                            <td>@_seller.Address.City</td>
                         </tr>
                         <tr>
                             <th scope="row">Street</th>
-                            <td>@seller.Address.Street</td>
+                            <td>@_seller.Address.Street</td>
                         </tr>
                         <tr>
                             <th scope="row">Street Number</th>
-                            <td>@seller.Address.StreetNumber</td>
+                            <td>@_seller.Address.StreetNumber</td>
                         </tr>
                         <tr>
                             <th scope="row">Apartment Number</th>
-                            <td>@seller.Address.ApartmentNumber</td>
+                            <td>@_seller.Address.ApartmentNumber</td>
                         </tr>
                     }
                     <tr>
                         <th scope="row">Phone</th>
-                        <td>@seller.Phone</td>
+                        <td>@_seller.Phone</td>
                     </tr>
                     <tr>
                         <th scope="row">Email</th>
-                        <td>@seller.Email</td>
+                        <td>@_seller.Email</td>
                     </tr>
                     <tr>
                         <th scope="row">Vat Payer</th>
-                        <td>@seller.IsVatPayer</td>
+                        <td>@_seller.IsVatPayer</td>
                     </tr>
                 </tbody>
             </table>
@@ -74,16 +74,16 @@
 </AuthorizeView>
 
 @code {
-    private AppUser user = new AppUser();
-    private Seller seller = new Seller();
+    private AppUser _user = new AppUser();
+    private Seller _seller = new Seller();
     protected override async Task OnInitializedAsync()
     {
-        var authState = await _auth.GetAuthenticationStateAsync();
+        var authState = await Auth.GetAuthenticationStateAsync();
         var authUser = authState.User;
-        var users = await _userService.GetAll();
-        user = users.FirstOrDefault(u => u.UserName == authUser.Identity.Name);
-        var sellers = await _sellerservice.GetAllSellersAsync();
-        seller = sellers.FirstOrDefault(s => s.User.Id == user.Id);
+        var users = await UserService.GetAll();
+        _user = users.FirstOrDefault(u => u.UserName == authUser.Identity.Name);
+        var sellers = await Sellerservice.GetAllSellersAsync();
+        _seller = sellers.FirstOrDefault(s => s.User.Id == _user.Id);
     }
 
 }

@@ -19,34 +19,34 @@ namespace InvoiceApplication.Services.Items
 
         public async Task AddNewItemAsync(Item item)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
 
-            _context.Add(item);
-            await _context.SaveChangesAsync();
+            context.Add(item);
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteItemAsync(Item item)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
 
-            _context.Remove(item);
-            await _context.SaveChangesAsync();
+            context.Remove(item);
+            await context.SaveChangesAsync();
 
         }
 
         public async Task<List<Item>> GetAllItemsAsync()
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
 
-            return await _context.Item.Include(v => v.VatRate).Include(i=>i.UnitOfMeasure).ToListAsync();
+            return await context.Item.Include(v => v.VatRate).Include(i=>i.UnitOfMeasure).ToListAsync();
         }
 
         public async Task<Item> GetItemByIdAsync(int id)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
 
 
-            var item = await _context.Item.FindAsync(id);
+            var item = await context.Item.FindAsync(id);
 
             if (item != null)
             {
@@ -61,18 +61,18 @@ namespace InvoiceApplication.Services.Items
 
         public async Task<List<Item>> GetUSerItemsAsync()
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
             var user =await _userService.GetCurrentUser();
 
-            return await _context.Item.Where(i=>i.SellerId==user.Seller.Id).Include(v => v.VatRate).Include(i => i.UnitOfMeasure).ToListAsync();
+            return await context.Item.Where(i=>i.SellerId==user.Seller.Id).Include(v => v.VatRate).Include(i => i.UnitOfMeasure).ToListAsync();
 
         }
 
         public async Task UpdateItemAsync(Item item)
         {
-            using var _context = _contextFactoy.CreateDbContext();
+            using var context = _contextFactoy.CreateDbContext();
 
-            var existingItem = await _context.Item.FindAsync(item.Id);
+            var existingItem = await context.Item.FindAsync(item.Id);
 
             if (existingItem != null)
             {
@@ -81,11 +81,11 @@ namespace InvoiceApplication.Services.Items
                 existingItem.Ean = item.Ean;
                 existingItem.Comments = item.Comments;
                 existingItem.NetPrice = item.NetPrice;
-                existingItem.VatRateID = item.VatRateID;
+                existingItem.VatRateId = item.VatRateId;
                 existingItem.Quantity = item.Quantity;
                 existingItem.UnitOfMeasureId = item.UnitOfMeasureId;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             else
             {
