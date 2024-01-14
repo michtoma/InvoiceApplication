@@ -23,8 +23,8 @@ namespace InvoiceApplication.Models.Companies
         public IEnumerable<Invoice> Invoices { get; set; } = new List<Invoice>();
         public AppUser? User { get; set; }
         public string UserId { get; set; }
-        public IEnumerable<Buyer> Buyers { get; set; } = Enumerable.Empty<Buyer>();
-        public IEnumerable<Item> Items { get; set; } = Enumerable.Empty<Item>();
+        public IEnumerable<Buyer> Buyers { get; set; } = new List<Buyer>();
+        public IEnumerable<Item> Items { get; set; } = new List<Item>();
 
     }
 }

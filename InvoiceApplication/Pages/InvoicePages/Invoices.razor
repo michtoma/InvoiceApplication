@@ -4,8 +4,8 @@
 
 <PageTitle>Invoice List</PageTitle>
 <AuthorizeView>
-     <ChildContent Context="gridContext">
-         
+    <ChildContent Context="gridContext">
+
         <h3>Invoice List</h3>
         <a class="btn btn-outline-primary" href="invoiceAction">Add New</a>
         @if (_invoices == null)
@@ -14,23 +14,24 @@
         }
         else
         {
-            <QuickGrid Items="_invoices.AsQueryable()" Pagination="_paginationState" ResizableColumns="true" Class="table table-striped" >
+            <QuickGrid Items="_invoices.AsQueryable()" Pagination="_paginationState" ResizableColumns="true" Class="table table-striped">
 
-                    <PropertyColumn Property="@(i=>i.Number)" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.PaymentDate)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.IsPaid)" Sortable="true"></PropertyColumn>
-                    <TemplateColumn Title="Action Buttons">
-                        <button class="btn btn-danger" @onclick="(d=> ShowInvoiceDetails(context.Id))">View</button>
-                        <button class="btn btn-dark" @onclick="(e=> EditInvoice(context.Id))">Edit</button>
-                    </TemplateColumn>
+                <PropertyColumn Property="@(i=>i.Number)" Sortable="true"></PropertyColumn>
+                <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
+                <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
+                <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
+                <PropertyColumn Property="@(i=>i.PaymentDate)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
+                <PropertyColumn Property="@(i=>i.IsPaid)" Sortable="true"></PropertyColumn>
+                <TemplateColumn Title="Action Buttons">
+                    <button class="btn btn-danger" @onclick="(d=> ShowInvoiceDetails(context.Id))">View</button>
+                    <button class="btn btn-dark" @onclick="(e=> EditHeader(context.Id))">Edit Header</button>
+                    <button class="btn btn-dark" @onclick="(e=> EditItems(context.Id))">Edit Items</button>
+                </TemplateColumn>
             </QuickGrid>
             <Paginator Value="_paginationState" />
         }
 
-     </ChildContent>
+    </ChildContent>
 </AuthorizeView>
 
 @code {
@@ -42,9 +43,13 @@
     {
         _invoices = await InvoiceService.GetUSerInvoicesAsync();
     }
-    private void EditInvoice(int invoiceId)
+    private void EditHeader(int invoiceId)
     {
         NavigationManager.NavigateTo($"invoiceAction/{invoiceId}");
+    }
+    private void EditItems(int invoiceId)
+    {
+        NavigationManager.NavigateTo($"AddItemToInvoice/{invoiceId}");
     }
     private void ShowInvoiceDetails(int invoiceId)
     {

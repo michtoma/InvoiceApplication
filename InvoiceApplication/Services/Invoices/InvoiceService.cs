@@ -56,7 +56,8 @@ namespace InvoiceApplication.Services.Invoices
         public async Task<Invoice> GetInvoiceByIdAsync(int id)
         {
             using var context = await _contextFactory.CreateDbContextAsync();
-            var invoice = await context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).ThenInclude(it=>it.UnitOfMeasure).Include(i=>i.BuyerAddress).Include(i=>i.SellerAddress).FirstOrDefaultAsync(i=> i.Id == id);
+            var invoice = await context.Invoice.Include(i=>i.InvoiceItems).ThenInclude(ii=>ii.Item).ThenInclude(it=>it.UnitOfMeasure)
+                .Include(i=>i.BuyerAddress).Include(i=>i.SellerAddress).Include(i=>i.Buyer).ThenInclude(b=>b.Address).Include(i=>i.Seller).ThenInclude(s=>s.Address).FirstOrDefaultAsync(i=> i.Id == id);
 
             if (invoice != null)
             {

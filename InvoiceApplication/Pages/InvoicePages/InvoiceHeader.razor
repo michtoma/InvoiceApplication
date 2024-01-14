@@ -1,0 +1,38 @@
+﻿@if(_invoice.Id!=0)
+{  
+<div class="invoice-header">
+    <h4 class="text-end">@_invoice.SellerAddress.City, @_invoice.CreateDate.ToShortDateString()</h4>
+    <h4 class="text-start">Faktura numer @_invoice.Number</h4>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="invoice-header-info">
+                <div>@_invoice.Seller.Name</div>
+                <div>@_invoice.Seller.Address.Street @_invoice.Seller.Address.StreetNumber/@_invoice.Seller.Address.ApartmentNumber</div>
+                <div>@_invoice.Seller.Address.PostalCode @_invoice.Seller.Address.City</div>
+                <div>NIP: @_invoice.Seller.Nip</div>
+                <div>Email: @_invoice.Seller.Email</div>
+                <div>Phone: @_invoice.Seller.Phone</div>
+            </div>
+        </div>
+        <div class="col-6 text-right">
+            <div class="invoice-header-info">
+                <div>@_invoice.Buyer.Name</div>
+                <div>@_invoice.Buyer.Address.Street @_invoice.Buyer.Address.StreetNumber/@_invoice.Buyer.Address.ApartmentNumber</div>
+                <div>@_invoice.Buyer.Address.PostalCode @_invoice.Buyer.Address.City</div>
+                <div>NIP: @_invoice.Buyer.Nip</div>
+                <div>Email: @_invoice.Buyer.Email</div>
+                <div>Phone: @_invoice.Buyer.Phone</div>
+            </div>
+        </div>
+    </div>
+    </div>
+}
+else
+{
+    <p>Loading ...</p>
+}
+@code {
+    [Parameter]
+    public Invoice _invoice { get; set; }
+}

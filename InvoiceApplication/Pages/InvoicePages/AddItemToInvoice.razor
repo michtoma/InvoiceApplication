@@ -1,0 +1,192 @@
+﻿@page "/AddItemToInvoice/{_invoiceId:int}"
+@inject NavigationManager NavigationManager
+@inject IInvoiceService InvoiceService
+@inject IAppUserService UserService
+@inject IInvoiceItemService InvItemService
+@inject IItemService ItemService
+
+<ModalItemList IsVisible="_isVisibleItemsModal" Items="_items" OnCLickClose="ShowItemsModal" OnCLickAdd="AddItem"></ModalItemList>
+<ModalItemsInvoiceEdit @ref="_modalInvItemEdit" OnClickClose="CloseEditInvoiceItem"></ModalItemsInvoiceEdit>
+<ModalWindow ModalMessage="_modalModelMessage" OnCancel="OnCancel" OnConfirm="OnConfirm"></ModalWindow>
+<InvoiceHeader _invoice="_invoice"></InvoiceHeader>
+<div class="mt-4">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Item Name</th>
+                <th>Unit</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total Net Value</th>
+                <th>VAT Rate</th>
+                <th>Total Gross Value</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (_invoice.InvoiceItems != null)
+            {
+                @foreach (var (item, index) in _invoice.InvoiceItems.Select((item, index) => (item, index)))
+                {
+                    <tr>
+                        <td>@(index + 1)</td>
+                        <td>
+                            @item.Item.Name
+                            @if (item.Description != "")
+                            {
+                                <br />
+                                <textarea readonly class="form-control">@item.Description</textarea>
+                            }
+                        </td>
+                        <td>@item.Item.UnitOfMeasure.ShortName</td>
+                        <td>@item.NetPrice.ToString("0.00")</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.TotalNetValue.ToString("0.00")</td>
+                        <td>@item.VatRate</td>
+                        <td>@item.TotalGrossValue.ToString("0.00")</td>
+                        <td>
+                            <button class="btn btn-dark" @onclick="(()=> EditItem(item.Id))">Edit</button>
+                            <button class="btn btn-danger ms-2" @onclick="(()=> DeleteInvoiceItem(item.Id))">Delete</button>
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="4"></td>
+                <th>Total:</th>
+                <td>@_invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00")</td>
+                <td>XXX</td>
+                <td>@_invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00")</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-outline-primary me-2" @onclick="ShowItemsModal">Add Item to Invoice </button>
+    <a class="btn btn-outline-secondary me-2" href="/invoices">Back to invoice list </a>
+</div>
+
+
+@code {
+    [Parameter]
+    public int _invoiceId { get; set; }
+    private Invoice _invoice = new();
+    ModalMessage _modalModelMessage = new();
+    ModalItemsInvoiceEdit? _modalInvItemEdit;
+    List<Item> _items = new();
+    bool _isVisibleItemsModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_invoiceId == 0) NavigationManager.NavigateTo("/invoices"); 
+        var _user =await UserService.GetCurrentUser();
+        _invoice = await InvoiceService.GetInvoiceByIdAsync(_invoiceId);
+        if (_invoice.AppUserId != _user.Id) NavigationManager.NavigateTo("/invoices");
+        else
+        {
+            _items = await ItemService.GetUSerItemsAsync();
+        }
+
+    }
+    private async Task AddItem(int itemId)
+    {
+        InvoiceItems _invoiceItem = new();
+        var _selectedItem = _items.FirstOrDefault(i => i.Id == itemId);
+        _invoiceItem.ItemId = _selectedItem.Id;
+        _invoiceItem.VatRate = _selectedItem.VatRate.Rate;
+        _invoiceItem.InvoiceId = _invoice.Id;
+        _invoiceItem.NetPrice = _selectedItem.NetPrice;
+        _invoiceItem.Quantity += 1;
+        await InvItemService.AddInvoiceItemAsync(_invoiceItem);
+        _isVisibleItemsModal = false;
+        _modalModelMessage.Type = ModalType.Success;
+        _modalModelMessage.Title = "Success";
+        _modalModelMessage.Body = "The item has been successfully added to the invoice";
+        _modalModelMessage.IsVisible = true;
+        StateHasChanged();
+        await OnInitializedAsync();
+    }
+    private async Task EditItem(int invoiceItemId)
+    {
+        _modalInvItemEdit.Item = await InvItemService.GetInvoiceItemByIdAsync(invoiceItemId);
+        _modalInvItemEdit.IsVisible = true;
+        _modalInvItemEdit.WasEdited = false;
+        StateHasChanged();
+
+    }
+    private async Task CloseEditInvoiceItem()
+    {
+        if (_modalInvItemEdit.WasEdited)
+        {
+            _modalInvItemEdit.IsVisible = false;
+            _modalModelMessage.Body = "The invoice item has been updated";
+            _modalModelMessage.Title = "Success";
+            _modalModelMessage.Type = ModalType.Success;
+            _modalModelMessage.IsVisible = true;
+            StateHasChanged();
+            await OnInitializedAsync();
+
+        }
+        else
+        {
+            _modalInvItemEdit.IsVisible = false;
+            StateHasChanged();
+        }
+    }
+    private async Task DeleteInvoiceItem(int invoiceItemId)
+    {
+        var invoiceItemToDelete = await InvItemService.GetInvoiceItemByIdAsync(invoiceItemId);
+        _modalModelMessage.Type = ModalType.Danger;
+        _modalModelMessage.Title = "Warrning";
+        _modalModelMessage.Body = $"Do you realy want delete {invoiceItemToDelete.Item.Name} ???";
+        _modalModelMessage.IsVisible = true;
+        _modalModelMessage.IdToDelte = invoiceItemId;
+        StateHasChanged();
+
+    }
+    private async Task DeleteInvoiceItemConfirmed()
+    {
+        if (_modalModelMessage.IdToDelte == null || _modalModelMessage.IdToDelte == 0)
+        {
+            _modalModelMessage.Type = ModalType.Error;
+            _modalModelMessage.Title = "Something went wrong";
+            _modalModelMessage.Body = "The item has not been deleted from the invoice";
+            _modalModelMessage.IsVisible = true;
+            StateHasChanged();
+
+        }
+        else
+        {
+            await InvItemService.DeleteInvoiceItemByIdAsync((int)_modalModelMessage.IdToDelte);
+            _modalModelMessage.IdToDelte = null;
+            _modalModelMessage.Type = ModalType.Success;
+            _modalModelMessage.Title = "Success";
+            _modalModelMessage.Body = "The item has been successfully deleted from the invoice";
+            _modalModelMessage.IsVisible = true;
+            _invoice = await InvoiceService.GetInvoiceByIdAsync(_invoiceId);
+            StateHasChanged();
+        }
+
+    }
+    private void OnConfirm(MouseEventArgs e)
+    {
+        
+        if (_modalModelMessage.IdToDelte != null)
+        {
+            DeleteInvoiceItemConfirmed();
+
+        }
+    }
+    private void ShowItemsModal()
+    {
+        _isVisibleItemsModal = !_isVisibleItemsModal;
+    }
+    private void OnCancel(MouseEventArgs e)
+    {
+        _modalModelMessage = new();
+        StateHasChanged();
+
+    }
+
+
+}
