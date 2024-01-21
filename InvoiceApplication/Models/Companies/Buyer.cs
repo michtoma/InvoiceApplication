@@ -19,7 +19,7 @@ namespace InvoiceApplication.Models.Companies
         public Address? Address { get; set; }
         public int? AddressId { get; set; }
         public bool IsActive { get; set; }
-        public IEnumerable<Invoice> Invoices { get; set; } = Enumerable.Empty<Invoice>();
+        public IEnumerable<Invoice> Invoices { get; set; } = new List<Invoice>();
         public Seller? Seller { get; set; }
         public int? SellerId { get; set; }   
 

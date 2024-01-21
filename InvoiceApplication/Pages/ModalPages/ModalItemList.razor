@@ -4,7 +4,7 @@
 @if (IsVisible)
 {
     <div class="modal modal-dialog-centered modal-dialog-scrollable" tabindex="-1" role="dialog" id="modalChoice" >
-        <div class="modal-dialog" role="dialog">
+        <div class="modal-dialog modal-lg" role="dialog">
             <div class="modal-content rounded-3 shadow">
                 <div class="modal-header text-center">
                         Items List
@@ -16,8 +16,10 @@
                         <QuickGrid Items="Items.AsQueryable()" Pagination="_paginationState" Class="table table-bordered table-striped">
                             <PropertyColumn Property="i=>i.Name"></PropertyColumn>
                             <PropertyColumn Property="i=>i.Ean"></PropertyColumn>
+                            <PropertyColumn Property="i=>i.NetPrice"></PropertyColumn>
+                            <PropertyColumn Property="i=>i.UnitOfMeasure.Name" Title="Unit"></PropertyColumn>
                             <TemplateColumn Title="Action">
-                                <button class="btn btn-success" @onclick="(c=> AddItemAction(context.Id))">Add</button>
+                                <button class="btn btn-success" @onclick="(()=> AddItemAction(context.Id))">Add</button>
                             </TemplateColumn>
                         </QuickGrid>
                         <Paginator Value="_paginationState" />
@@ -41,11 +43,7 @@
     public EventCallback<MouseEventArgs> OnCLickClose { get; set; }
     [Parameter]
     public EventCallback<int> OnCLickAdd { get; set; }
-
     PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
-    private void AddItemAction(int itemId)
-    {
-        OnCLickAdd.InvokeAsync(itemId);
-    }
+    private void AddItemAction(int itemId) => OnCLickAdd.InvokeAsync(itemId);
 
 }

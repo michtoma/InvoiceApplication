@@ -10,13 +10,9 @@ using Xunit.Sdk;
 namespace InvoiceApplication.Models.Items.Tests
 {
     [TestClass()]
-    public class ItemTests
-    {
-        [TestMethod()]
-        public void SetNetPriceByGrossTest()
-        {
-            Assert.Fail();
-        }
+    public class ItemTests 
+    { 
+    
     }
 
 }

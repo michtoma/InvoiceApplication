@@ -7,7 +7,7 @@
         <div class="modal-dialog" role="dialog">
             <div class="modal-content rounded-3 shadow">
                 <div class="modal-body p-4 text-center">
-                    <h5 class="mb-0">Items Operations</h5>
+                    <h5 class="mb-0">Edit Invoice Item</h5>
 
                     <EditForm Model="Item" OnValidSubmit="SubmitForm">
                         <DataAnnotationsValidator />
@@ -17,7 +17,7 @@
                                 <InputNumber id="id" @bind-Value="Item.Id" class="form-control"></InputNumber>
                                 <ValidationMessage For="@(() => Item.Id)" />
                             </div>
-                            <div class="col-8">
+                            <div class="col-12">
                                 <label for="name">Name</label>
                                 <InputText id="name" @bind-Value="Item.Item.Name" class="form-control"></InputText>
                                 <ValidationMessage For="@(() => Item.Item.Name)" />

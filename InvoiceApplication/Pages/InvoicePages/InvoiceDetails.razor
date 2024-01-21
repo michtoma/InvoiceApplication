@@ -102,6 +102,10 @@ else
     </div>
 
     <button class="btn btn-secondary my-2" @onclick="BackToInvoiceList">Back to Invoice List</button>
+    @if (_invoice.IsEditable)
+    {
+        <button class="btn btn-outline-warning" @onclick="FinalizeInvoice">Finalize Invoice </button>
+    }
 }
 
 @code {
@@ -124,5 +128,9 @@ else
     private void BackToInvoiceList()
     {
         NavigationManager.NavigateTo("/invoices");
+    }
+    private async Task FinalizeInvoice()
+    {
+        await Service.FinalizeInvoice(_invoice);
     }
 }

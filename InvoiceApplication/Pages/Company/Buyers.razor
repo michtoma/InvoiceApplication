@@ -1,5 +1,9 @@
 ﻿@page "/buyers"
 @inject IBuyerService BuyerService
+@inject IAppUserService UserService
+@inject INumberGenerator _numberGenerator
+@inject IInvoiceService InvoiceService
+@inject NavigationManager NavigationManager
 <h3>Buyers</h3>
 @if (_buyers is null)
 {
@@ -21,7 +25,7 @@ else
         <PropertyColumn Property="@(b=>b.Address.Street)" Sortable="true"></PropertyColumn>
         <PropertyColumn Property="@(b=>b.IsActive)" Sortable="true"></PropertyColumn>
         <TemplateColumn Title="Action">
-            <button class="btn btn-primary">Create Invoice</button>
+            <button class="btn btn-primary" @onclick="()=>CreateInvoice(context.Id)">Create Invoice</button>
             <button class="btn btn-dark">History</button>
         </TemplateColumn>
     </QuickGrid>
@@ -33,8 +37,24 @@ else
     List<Buyer> _buyers = new();
     protected override async Task OnInitializedAsync()
     {
-        _buyers =await BuyerService.GetUserBuyersAsync();
+        _buyers = await BuyerService.GetUserBuyersAsync();
     }
+    private async Task CreateInvoice(int buyerId)
+    {
+        var user = await UserService.GetCurrentUser();
+        var number = await _numberGenerator.GenerateInvoiceNumber(DateTime.Now);
+        Invoice _invoice = new()
+            {
+                BuyerId = buyerId,
+                SellerId = user.Seller.Id,
+                AppUserId = user.Id,
+                SellerAddressId = user.Seller.AddressId,
+                Number = number,
+                DaysOfPaiment = 0
 
+            };
+        await InvoiceService.AddInvoiceAsync(_invoice);
+        NavigationManager.NavigateTo($"/invoiceaction/{_invoice.Id}");
+    }
 
 }
