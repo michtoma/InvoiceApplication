@@ -63,6 +63,12 @@
         </tbody>
     </table>
     <button class="btn btn-outline-primary me-2" @onclick="ShowItemsModal">Add Item to Invoice </button>
+    @if (_invoice.InvoiceItems.Count() > 0)
+    {
+
+        <button class="btn btn-outline-warning me-2" type="button" @onclick="FinalizeInvoice">Finalize Invoice </button>
+    }
+
     <a class="btn btn-outline-secondary me-2" href="/invoices">Back to invoice list </a>
 </div>
 
@@ -96,7 +102,7 @@
         _invoiceItem.VatRate = _selectedItem.VatRate.Rate;
         _invoiceItem.InvoiceId = _invoice.Id;
         _invoiceItem.NetPrice = _selectedItem.NetPrice;
-        _invoiceItem.Quantity += 1;
+        _invoiceItem.Quantity = 1;
         await InvItemService.AddInvoiceItemAsync(_invoiceItem);
         _isVisibleItemsModal = false;
         _modalModelMessage.Type = ModalType.Success;
@@ -187,6 +193,10 @@
         StateHasChanged();
 
     }
-
+    private async Task FinalizeInvoice()
+    {
+        await InvoiceService.FinalizeInvoice(_invoice);
+        NavigationManager.NavigateTo("invoices");
+    }
 
 }

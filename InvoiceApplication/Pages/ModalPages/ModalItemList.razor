@@ -17,7 +17,7 @@
                             <PropertyColumn Property="i=>i.Name"></PropertyColumn>
                             <PropertyColumn Property="i=>i.Ean"></PropertyColumn>
                             <PropertyColumn Property="i=>i.NetPrice"></PropertyColumn>
-                            <PropertyColumn Property="i=>i.UnitOfMeasure.Name"></PropertyColumn>
+                            <PropertyColumn Property="i=>i.UnitOfMeasure.Name" Title="Unit"></PropertyColumn>
                             <TemplateColumn Title="Action">
                                 <button class="btn btn-success" @onclick="(()=> AddItemAction(context.Id))">Add</button>
                             </TemplateColumn>
@@ -43,11 +43,7 @@
     public EventCallback<MouseEventArgs> OnCLickClose { get; set; }
     [Parameter]
     public EventCallback<int> OnCLickAdd { get; set; }
-
     PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
-    private void AddItemAction(int itemId)
-    {
-        OnCLickAdd.InvokeAsync(itemId);
-    }
+    private void AddItemAction(int itemId) => OnCLickAdd.InvokeAsync(itemId);
 
 }

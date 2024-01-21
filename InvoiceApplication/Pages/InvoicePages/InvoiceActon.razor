@@ -11,82 +11,95 @@
 <PageTitle>@((InvoiceId == null || InvoiceId == 0) ? "Add New Invoice" : "Update Invoice header")</PageTitle>
     <ModalWindow ModalMessage="_modalModelMessage" OnCancel="OnCancel" OnConfirm="OnConfirm"></ModalWindow>
     <h3>@((InvoiceId == null || InvoiceId == 0) ? "Add New Invoice" : "Update Invoice header")</h3>
-<EditForm Model="_invoice" OnValidSubmit="HeaderConirmation">
-    <DataAnnotationsValidator />
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label for="buyer" class="form-label">Buyer</label>
-            <InputSelect id="buyer" class="form-select" ValueExpression="@(()=>_invoice.BuyerId)"
-                         Value="@_invoice.BuyerId" ValueChanged="@((int? args) => { _invoice.BuyerId = args; AddressSet(args); })" required>
-                <option value="" selected disabled>Select Company</option>
-                @foreach (var buyer in _buyers)
+@if (_buyers.Count() == 0)
+{
+    <p class="text-danger">First you should add new buyer</p>
+    <a class="btn btn-primary" href="/newbuyer">Add new buyer</a>
+}
+else
+{
+    <EditForm Model="_invoice" OnValidSubmit="HeaderConirmation">
+        <DataAnnotationsValidator />
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="buyer" class="form-label">Buyer</label>
+                <InputSelect id="buyer" class="form-select" ValueExpression="@(()=>_invoice.BuyerId)"
+                             Value="@_invoice.BuyerId" ValueChanged="@((int? args) => { _invoice.BuyerId = args; AddressSet(args); })" required>
+                    <option value="" selected disabled>Select Company</option>
+                    @foreach (var buyer in _buyers)
+                    {
+                        <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
+                    }
+                </InputSelect>
+                @if (_buyerAddress is not null)
                 {
-                    <option value="@buyer.Id">@buyer.Name @buyer.Nip</option>
+                    <div class="mt-2">
+                        <label class="fw-bold">Buyer Address:</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="street" class="form-label">Street:</label>
+                                <input type="text" id="street" name="street" value="@_buyerAddress.Street" class="form-control" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="streetNumber" class="form-label">Street Number:</label>
+                                <input type="text" id="streetNumber" name="streetNumber" value="@_buyerAddress.StreetNumber" class="form-control" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="apartmentNumber" class="form-label">Apartment Number:</label>
+                                <input type="text" id="apartmentNumber" name="apartmentNumber" value="@_buyerAddress.ApartmentNumber" class="form-control" disabled>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="postalCode" class="form-label">Postal Code:</label>
+                                <input type="text" id="postalCode" name="postalCode" value="@_buyerAddress.PostalCode" class="form-control" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="city" class="form-label">City:</label>
+                                <input type="text" id="city" name="city" value="@_buyerAddress.City" class="form-control" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="country" class="form-label">Country:</label>
+                                <input type="text" id="country" name="country" value="@_buyerAddress.Country" class="form-control" disabled>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </InputSelect>
-            @if (_buyerAddress is not null)
-            {
-                <div class="mt-2">
-                    <label class="fw-bold">Buyer Address:</label>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="street" class="form-label">Street:</label>
-                            <input type="text" id="street" name="street" value="@_buyerAddress.Street" class="form-control" disabled>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="streetNumber" class="form-label">Street Number:</label>
-                            <input type="text" id="streetNumber" name="streetNumber" value="@_buyerAddress.StreetNumber" class="form-control" disabled>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="apartmentNumber" class="form-label">Apartment Number:</label>
-                            <input type="text" id="apartmentNumber" name="apartmentNumber" value="@_buyerAddress.ApartmentNumber" class="form-control" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="postalCode" class="form-label">Postal Code:</label>
-                            <input type="text" id="postalCode" name="postalCode" value="@_buyerAddress.PostalCode" class="form-control" disabled>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="city" class="form-label">City:</label>
-                            <input type="text" id="city" name="city" value="@_buyerAddress.City" class="form-control" disabled>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="country" class="form-label">Country:</label>
-                            <input type="text" id="country" name="country" value="@_buyerAddress.Country" class="form-control" disabled>
-                        </div>
-                    </div>
+            </div>
+            <div class="col-md-3">
+                <label for="number" class="form-label">Number</label>
+                <InputText id="number" @bind-Value="_invoice.Number" class="form-control" disabled></InputText>
+                <ValidationMessage For="@(() => _invoice.Number)" />
+            </div>
+            <div class="col-md-3">
+                <label for="createDate" class="form-label">Create Date</label>
+                <InputDate id="createDate" @bind-Value="_invoice.CreateDate" class="form-control" disabled></InputDate>
+                <ValidationMessage For=@(()=>_invoice.CreateDate) />
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold">Payment Information:</label>
+                <div>
+                    <label>Number of days of payment deadline: </label>
+                    <InputNumber id="days" @bind-Value="_invoice.DaysOfPaiment"></InputNumber>
+                    <label>Payment deadline: @DateOnly.FromDateTime(_invoice.PaymentDate)</label>
                 </div>
+                <label for="description" class="form-label">Description</label>
+                <InputText id="description" @bind-Value="_invoice.Description" class="form-control"></InputText>
+                <ValidationMessage For=@(()=>_invoice.Description) />
+            </div>
+        </div>
+        <div class="mt-2">
+            <button class="btn btn-success my-2" type="submit">@((InvoiceId == null || InvoiceId == 0) ? "Save Invoice" : "Save changes")</button>
+            <a class="btn btn-secondary my-2" href="/Invoices">Back to List </a>
+            <button class="btn btn-primary my-2" type="button" @onclick="AddItems">Edit invoice items</button>
+            @if (_invoice.InvoiceItems.Count() > 0)
+            {
+
+                <button class="btn btn-outline-warning ms-1" type="button" @onclick="FinalizeInvoice">Finalize Invoice </button>
             }
         </div>
-        <div class="col-md-3">
-            <label for="number" class="form-label">Number</label>
-            <InputText id="number" @bind-Value="_invoice.Number" class="form-control" disabled></InputText>
-            <ValidationMessage For="@(() => _invoice.Number)" />
-        </div>
-        <div class="col-md-3">
-            <label for="createDate" class="form-label">Create Date</label>
-            <InputDate id="createDate" @bind-Value="_invoice.CreateDate" class="form-control" disabled></InputDate>
-            <ValidationMessage For=@(()=>_invoice.CreateDate) />
-        </div>
-        <div class="mb-3">
-            <label class="fw-bold">Payment Information:</label>
-            <div>
-                <label>Number of days of payment deadline: </label>
-                <InputNumber id="days" @bind-Value="_invoice.DaysOfPaiment"></InputNumber>
-                <label>Payment deadline: @DateOnly.FromDateTime(_invoice.PaymentDate)</label>
-            </div>
-            <label for="description" class="form-label">Description</label>
-            <InputText id="description" @bind-Value="_invoice.Description" class="form-control"></InputText>
-            <ValidationMessage For=@(()=>_invoice.Description) />
-        </div>
-    </div>
-    <div class="mt-2">
-        <button class="btn btn-success my-2" type="submit">@((InvoiceId == null || InvoiceId == 0) ? "Save Invoice" : "Update Invoice Header")</button>
-        <a class="btn btn-secondary my-2" href="/Invoices">Back to Invoice List </a>
-        <button class="btn btn-primary my-2" type="button" @onclick="AddItems"  >Add items to Invoice </button>
-    </div>
-</EditForm>
+    </EditForm>
+}
 
 
 
@@ -161,7 +174,7 @@
             _modalModelMessage.Title = "Error";
             _modalModelMessage.Body = "Choose a buyer";
             _modalModelMessage.IsVisible = true;
-            
+
         }
         else
         {
@@ -182,13 +195,13 @@
     }
     private async Task AddItems()
     {
-        if(_invoice.Id == 0 || _invoice is null)
+        if (_invoice.Id == 0 || _invoice is null)
         {
             _modalModelMessage.Type = ModalType.Info;
             _modalModelMessage.Title = "Error";
             _modalModelMessage.Body = "First you need to add Save Invoice";
             _modalModelMessage.IsVisible = true;
-                        
+
         }
         else NavigationManager.NavigateTo($"/AddItemToInvoice/{_invoice.Id}");
 
@@ -199,5 +212,9 @@
         StateHasChanged();
 
     }
-
+    private async Task FinalizeInvoice()
+    {
+        await InvoiceService.FinalizeInvoice(_invoice);
+        NavigationManager.NavigateTo("invoices");
+    }
 }

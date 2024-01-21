@@ -1,7 +1,6 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Companies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace InvoiceApplication.Services.Companies
 {
@@ -72,14 +71,7 @@ namespace InvoiceApplication.Services.Companies
 
                 if (existingAddress != null)
                 {
-                    existingAddress.Street = address.Street;
-                    existingAddress.City = address.City;
-                    existingAddress.PostalCode = address.PostalCode;
-                    existingAddress.BuyerId = address.BuyerId;
-                    existingAddress.SellerId = address.SellerId;
-                    existingAddress.Country = address.Country;
-                    existingAddress.IsActive = address.IsActive;
-                    context.Update(existingAddress);
+                    context.Update(address);
                     await context.SaveChangesAsync();
                 }
                 else
