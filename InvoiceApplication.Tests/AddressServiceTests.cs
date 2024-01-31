@@ -1,5 +1,4 @@
-﻿using InvoiceApplication.Data;
-using InvoiceApplication.Models.Companies;
+﻿using InvoiceApplication.Models.Companies;
 using InvoiceApplication.Services.Companies;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;

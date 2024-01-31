@@ -3,45 +3,44 @@
 @inject IVatRateService VatService
 
 <PageTitle>Items</PageTitle>
-<div class="container-fluid">
+<div class="table-responsive">
     <h3>Items</h3>
-    <button class="btn btn-outline-success mb-2" @onclick="AddNew">Dodaj Nowy</button>
+    <button class="btn btn-outline-secondary mb-2" @onclick="AddNew">Dodaj Nowy</button>
     <br />
-    <div class="row">
+    
         @if (_addNewVisisble)
         {
             <ItemsOperations ItemId="_itemId" IsVisible="_addNewVisisble" OnClickClose="ClickHandler"></ItemsOperations>
         }
         @if (_items is null)
         {
-            <p>        Loading ....    </p>
-        }
-        else if (_items.Count()==0)
-        {
             <p>Look like is nothing to show</p>
+        }
+        else if (_items.Count() == 0)
+        {
+            <p>        Loading ....    </p>
         }
         else
         {
 
-            <div>
-                <QuickGrid Items="_items.AsQueryable()" Class="table table-striped table-bordered">
-                    <PropertyColumn Property="@(i => i.Name)" Sortable="true" />
-                    <PropertyColumn Property="@(i=>i.Ean)" Sortable="true" />
-                    <PropertyColumn Property="@(i=>i.NetPrice)" Format="0.00 zł" Sortable="true" Title="Nett Price" />
-                    <PropertyColumn Property="@(i=>i.VatRate.Rate + " %")" Sortable="true" Title="Vat Rate" />
-                    <PropertyColumn Property="@(i=>i.GrossPrice)" Format="0.00 zł" Sortable="true" Title="Gross Price" />
-                    <PropertyColumn Property="@(i=>i.Quantity)" Sortable="true" Title="Quantity" />
-                    <PropertyColumn Property="@(i=>i.UnitOfMeasure.ShortName)" Sortable="true" Title="Unit" />
-                    <TemplateColumn Title="Actions">
-                        <button class="btn btn-secondary" @onclick="(e => Edit(context.Id))">Edit</button>
-                        <button class="btn btn-danger" @onclick="(e => Delete(context.Id))">Delete</button>
-                    </TemplateColumn>
+            <QuickGrid Items="_items.AsQueryable()" Class="table table-secondary table-striped table-bordered">
+                <PropertyColumn Property="@(i => i.Name)" Sortable="true" />
+                <PropertyColumn Property="@(i=>i.Ean)" Sortable="true" />
+                <PropertyColumn Property="@(i=>i.NetPrice)" Format="0.00 zł" Sortable="true" Title="Nett Price" />
+                <PropertyColumn Property="@(i=>i.VatRate.Rate + " %")" Sortable="true" Title="Vat Rate" />
+                <PropertyColumn Property="@(i=>i.GrossPrice)" Format="0.00 zł" Sortable="true" Title="Gross Price" />
+                <PropertyColumn Property="@(i=>i.Quantity)" Sortable="true" Title="Quantity" />
+                <PropertyColumn Property="@(i=>i.UnitOfMeasure.ShortName)" Sortable="true" Title="Unit" />
+                <TemplateColumn Title="Actions">
+                    <button class="btn btn-secondary" @onclick="(e => Edit(context.Id))">Edit</button>
+                    <button class="btn btn-danger" @onclick="(e => Delete(context.Id))">Delete</button>
+                </TemplateColumn>
 
-                </QuickGrid>
+            </QuickGrid>
 
-            </div>
+
         }
-    </div>
+  
 </div>
 
 

@@ -20,7 +20,7 @@ namespace InvoiceApplication.Models.Items
         public UnitOfMeasure? UnitOfMeasure { get; set; }
         public int UnitOfMeasureId { get; set; } = 1;
         public Seller Seller { get; set; }
-        public int SellerId { get;set; }
+        public int SellerId { get; set; }
         [NotMapped]
         public double GrossPrice
         {

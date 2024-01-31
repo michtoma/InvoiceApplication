@@ -1,7 +1,6 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Items;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace InvoiceApplication.Services.Items
 {

@@ -17,10 +17,10 @@ namespace InvoiceApplication.Services.Invoices
         public async Task<string> GenerateInvoiceNumber(DateTime dateTime)
         {
             var user = await _appUserService.GetCurrentUser();
-            var userInvoices =await _invoiceService.GetUSerInvoicesAsync();
+            var userInvoices = await _invoiceService.GetUSerInvoicesAsync();
             StringBuilder stringBuilder = new();
             stringBuilder.Append("FV/");
-            stringBuilder.Append((userInvoices.Count()+1).ToString());
+            stringBuilder.Append((userInvoices.Count() + 1).ToString());
             stringBuilder.Append('/');
             stringBuilder.Append(dateTime.Month.ToString());
             stringBuilder.Append('/');

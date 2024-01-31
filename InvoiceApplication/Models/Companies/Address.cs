@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
 
 namespace InvoiceApplication.Models.Companies
 {
-    public class Address 
+    public class Address
     {
         public int Id { get; set; }
         [Required]
@@ -12,11 +10,11 @@ namespace InvoiceApplication.Models.Companies
         [Required]
         public string Street { get; set; } = string.Empty;
         [Required]
-        public string PostalCode { get; set; } =string.Empty;
+        public string PostalCode { get; set; } = string.Empty;
         [Required]
-        public string StreetNumber {  get; set; } = string.Empty;
+        public string StreetNumber { get; set; } = string.Empty;
         [Required]
-        public string ApartmentNumber {  get; set; } = string.Empty;
+        public string ApartmentNumber { get; set; } = string.Empty;
         [Required]
         public string Country { get; set; } = "Polska";
         public Seller? Seller { get; set; }

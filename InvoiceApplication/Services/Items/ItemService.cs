@@ -1,6 +1,5 @@
 ﻿using InvoiceApplication.Data;
 using InvoiceApplication.Models.Items;
-using InvoiceApplication.Pages;
 using InvoiceApplication.Services.Companies;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +37,7 @@ namespace InvoiceApplication.Services.Items
         {
             using var context = _contextFactoy.CreateDbContext();
 
-            return await context.Item.Include(v => v.VatRate).Include(i=>i.UnitOfMeasure).ToListAsync();
+            return await context.Item.Include(v => v.VatRate).Include(i => i.UnitOfMeasure).ToListAsync();
         }
 
         public async Task<Item> GetItemByIdAsync(int id)
@@ -62,9 +61,9 @@ namespace InvoiceApplication.Services.Items
         public async Task<List<Item>> GetUSerItemsAsync()
         {
             using var context = _contextFactoy.CreateDbContext();
-            var user =await _userService.GetCurrentUser();
+            var user = await _userService.GetCurrentUser();
 
-            return await context.Item.Where(i=>i.SellerId==user.Seller.Id).Include(v => v.VatRate).Include(i => i.UnitOfMeasure).ToListAsync();
+            return await context.Item.Where(i => i.SellerId == user.Seller.Id).Include(v => v.VatRate).Include(i => i.UnitOfMeasure).ToListAsync();
 
         }
 

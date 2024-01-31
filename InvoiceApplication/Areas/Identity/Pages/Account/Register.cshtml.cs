@@ -54,7 +54,7 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
             [Required]
             [MinLength(4)]
-            [Display(Name ="First Name")]
+            [Display(Name = "First Name")]
             public string FirstName { get; set; }
             [Required]
             [MinLength(4)]

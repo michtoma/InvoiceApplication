@@ -1,47 +1,76 @@
 ﻿@page "/buyers"
-@inject IBuyerService BuyerService
-@inject IAppUserService UserService
+@inject IBuyerService _buyerService
+@inject IAppUserService _userService
 @inject INumberGenerator _numberGenerator
-@inject IInvoiceService InvoiceService
-@inject NavigationManager NavigationManager
+@inject IInvoiceService _invoiceService
+@inject NavigationManager _navigationManager
 <h3>Buyers</h3>
-@if (_buyers is null)
-{
-    <p>
-        Loading ...
-    </p>
-}
-else if (_buyers.Count() == 0)
+<BuyerDetails @ref="_detailsSetings" OnClickClose="Close"></BuyerDetails>
+@if (buyers is null)
 {
     <p>Looks like there's nothing here</p>
 }
+else if (buyers.Count() == 0)
+{
+    <p>Loading ...</p>
+}
 else
 {
-
-    <QuickGrid Items="_buyers.AsQueryable()">
-        <PropertyColumn Property="@(b=>b.Nip)" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(b=>b.Name)" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(b=>b.Address.City)" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(b=>b.Address.Street)" Sortable="true"></PropertyColumn>
-        <PropertyColumn Property="@(b=>b.IsActive)" Sortable="true"></PropertyColumn>
-        <TemplateColumn Title="Action">
-            <button class="btn btn-primary" @onclick="()=>CreateInvoice(context.Id)">Create Invoice</button>
-            <button class="btn btn-dark">History</button>
-        </TemplateColumn>
-    </QuickGrid>
-
+    <div class="table-responsive">
+        <QuickGrid Items="filteredBuyers" Class="table table-secondary table-striped table-bordered">
+            <PropertyColumn Property="@(b=>b.Nip)" Sortable="true">
+                <ColumnOptions>
+                    <span class="oi oi-magnifying-glass"></span>
+                    <input type="search" class="oi-browser" autofocus @bind="nipFilter" @bind:event="oninput" placeholder="Serch" />
+                </ColumnOptions>
+            </PropertyColumn>
+            <PropertyColumn Property="@(b=>b.Name)" Sortable="true">
+                <ColumnOptions>
+                    <span class="oi oi-magnifying-glass"></span>
+                    <input type="search" class="oi-browser" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Serch" />
+                </ColumnOptions>
+            </PropertyColumn>
+            <PropertyColumn Property="@(b=>b.Address.City)" Sortable="true"></PropertyColumn>
+            <PropertyColumn Property="@(b=>b.Address.Street)" Sortable="true"></PropertyColumn>
+            <PropertyColumn Property="@(b=>b.IsActive)" Sortable="true"></PropertyColumn>
+            <TemplateColumn Title="Action">
+                <button class="btn btn-primary" @onclick="()=>CreateInvoice(context.Id)">Create Invoice</button>
+                <button class="btn btn-dark" @onclick="()=>ShowDetails(context.Id)">Details</button>
+            </TemplateColumn>
+            <a class="btn btn-outline-secondary" href="newbuyer">Add New</a>
+        </QuickGrid>
+    </div>
 }
-<a class="btn btn-primary" href="newbuyer">Add New</a>
 
 @code {
-    List<Buyer> _buyers = new();
+    string nameFilter;
+    string nipFilter;
+    bool detailVisible = false;
+    BuyerDetails? _detailsSetings;
+    List<Buyer> buyers = new();
+    IQueryable<Buyer> filteredBuyers
+    {
+        get
+        {
+            var result = buyers.AsQueryable();
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                result = result.Where(i => i.Name.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase)).AsQueryable();
+            }
+            if (!string.IsNullOrEmpty(nipFilter))
+            {
+                result = result.Where(i => i.Nip.Contains(nipFilter, StringComparison.CurrentCultureIgnoreCase)).AsQueryable();
+            }
+            return result.AsQueryable();
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
-        _buyers = await BuyerService.GetUserBuyersAsync();
+        buyers = await _buyerService.GetUserBuyersAsync();
     }
     private async Task CreateInvoice(int buyerId)
     {
-        var user = await UserService.GetCurrentUser();
+        var user = await _userService.GetCurrentUser();
         var number = await _numberGenerator.GenerateInvoiceNumber(DateTime.Now);
         Invoice _invoice = new()
             {
@@ -53,8 +82,18 @@ else
                 DaysOfPaiment = 0
 
             };
-        await InvoiceService.AddInvoiceAsync(_invoice);
-        NavigationManager.NavigateTo($"/invoiceaction/{_invoice.Id}");
+        await _invoiceService.AddInvoiceAsync(_invoice);
+        _navigationManager.NavigateTo($"/invoiceaction/{_invoice.Id}");
     }
-
+    private async Task ShowDetails(int buyerId)
+    {
+        _detailsSetings.buyer = buyers.FirstOrDefault(b => b.Id == buyerId);
+        detailVisible = !detailVisible;
+        _detailsSetings.IsVisible = detailVisible;
+        StateHasChanged();
+    }
+    public void Close()
+    {
+        detailVisible = !detailVisible;
+    }
 }

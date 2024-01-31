@@ -1,6 +1,4 @@
-﻿using InvoiceApplication.Models.Invoices;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace InvoiceApplication.Models.Companies
 {
@@ -11,6 +9,6 @@ namespace InvoiceApplication.Models.Companies
         public string LastName { get; set; }
         public IEnumerable<Buyer> Buyers { get; set; } = new List<Buyer>();
         public Seller? Seller { get; set; }
-        public int SellerId { get; set;}
+        public int SellerId { get; set; }
     }
 }

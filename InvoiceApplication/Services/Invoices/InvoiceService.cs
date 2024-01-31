@@ -1,12 +1,7 @@
 ﻿using InvoiceApplication.Data;
-using InvoiceApplication.Models.Companies;
 using InvoiceApplication.Models.Invoices;
 using InvoiceApplication.Services.Companies;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Xunit.Sdk;
 
 namespace InvoiceApplication.Services.Invoices
 {
@@ -91,7 +86,7 @@ namespace InvoiceApplication.Services.Invoices
         {
             using var context = await _contextFactory.CreateDbContextAsync();
             var user = await _userService.GetCurrentUser();
-            return await context.Invoice.Where(i => i.AppUserId == user.Id).Include(i => i.InvoiceItems).ThenInclude(ii => ii.Item).ThenInclude(it => it.UnitOfMeasure).Include(i=>i.Buyer).Include(i => i.BuyerAddress).Include(i => i.SellerAddress).ToListAsync();
+            return await context.Invoice.Where(i => i.AppUserId == user.Id).Include(i => i.InvoiceItems).ThenInclude(ii => ii.Item).ThenInclude(it => it.UnitOfMeasure).Include(i => i.Buyer).Include(i => i.BuyerAddress).Include(i => i.SellerAddress).ToListAsync();
         }
 
         public async Task<bool> InvoiceExist(int invoiceId)

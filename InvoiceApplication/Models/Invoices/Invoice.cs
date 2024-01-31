@@ -1,5 +1,4 @@
 ﻿using InvoiceApplication.Models.Companies;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoiceApplication.Models.Invoices
 {
@@ -22,7 +21,7 @@ namespace InvoiceApplication.Models.Invoices
         {
             get
             {
-              return CreateDate.AddDays(DaysOfPaiment);
+                return CreateDate.AddDays(DaysOfPaiment);
             }
         }
         public bool IsPaid { get; set; } = false;

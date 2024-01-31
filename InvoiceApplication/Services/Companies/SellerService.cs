@@ -40,7 +40,7 @@ namespace InvoiceApplication.Services.Companies
             using var context = _dbContextFactory.CreateDbContext();
             try
             {
-                return await context.Sellers.Include(s=>s.Address).FirstOrDefaultAsync(s=>s.Id==sellerId);
+                return await context.Sellers.Include(s => s.Address).FirstOrDefaultAsync(s => s.Id == sellerId);
             }
             catch (Exception ex)
             {
@@ -53,7 +53,7 @@ namespace InvoiceApplication.Services.Companies
         public async Task<List<Seller>> GetAllSellersAsync()
         {
             using var context = _dbContextFactory.CreateDbContext();
-            return await context.Sellers.Include(s=>s.User).Include(s=>s.Address).ToListAsync();
+            return await context.Sellers.Include(s => s.User).Include(s => s.Address).ToListAsync();
         }
 
         public async Task UpdateSellerAsync(Seller seller)

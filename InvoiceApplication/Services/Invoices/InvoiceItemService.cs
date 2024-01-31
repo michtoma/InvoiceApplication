@@ -7,7 +7,7 @@ namespace InvoiceApplication.Services.Invoices
     public class InvoiceItemService : IInvoiceItemService
     {
         private readonly IDbContextFactory<AppDbContext> _contextFactory;
-        
+
 
         public InvoiceItemService(IDbContextFactory<AppDbContext> contextFactory)
         {
@@ -55,7 +55,7 @@ namespace InvoiceApplication.Services.Invoices
             using var context = await _contextFactory.CreateDbContextAsync();
             try
             {
-                return await context.InvoiceItems.Include(i=>i.Item).FirstOrDefaultAsync(i=>i.Id==invoiceItemId);
+                return await context.InvoiceItems.Include(i => i.Item).FirstOrDefaultAsync(i => i.Id == invoiceItemId);
             }
             catch (Exception ex)
             {

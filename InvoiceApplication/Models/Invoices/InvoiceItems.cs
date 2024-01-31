@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using InvoiceApplication.Models.Items;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using InvoiceApplication.Models.Items;
 
 namespace InvoiceApplication.Models.Invoices
 {

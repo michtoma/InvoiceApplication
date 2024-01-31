@@ -38,7 +38,7 @@ namespace InvoiceApplication.Services.Companies
         public async Task<List<Address>> GetAddressByBuyerIdAsync(int companyId)
         {
             using var context = _contextFactoy.CreateDbContext();
-            return await context.Addresses.Where(a=>a.BuyerId == companyId).ToListAsync();
+            return await context.Addresses.Where(a => a.BuyerId == companyId).ToListAsync();
         }
 
         public async Task<Address> GetAddressByIdAsync(int addressId)
@@ -54,7 +54,7 @@ namespace InvoiceApplication.Services.Companies
                 throw;
             }
         }
-    
+
 
         public async Task<List<Address>> GetAllAddressesAsync()
         {

@@ -27,7 +27,7 @@ namespace InvoiceApplication.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync()
         {
             ReturnUrl = Url.Content("~/");
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, false, lockoutOnFailure: false);
                 if (result.Succeeded) return LocalRedirect(ReturnUrl);

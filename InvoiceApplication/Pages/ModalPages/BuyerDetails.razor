@@ -1,0 +1,110 @@
+﻿@inject IInvoiceService _invoiceService
+@if (IsVisible)
+{
+    <div class="modal modal-scrollable modal-dialog-centered" tabindex="-1" role="dialog" id="modalDetails">
+        <div class="modal-dialog  modal-lg" role="dialog">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-body p-4 text-center">
+                    @if (buyerInvoices is null)
+                    {
+                        <p>Loading...</p>
+                    }
+                    else
+                    {
+                        <div>
+                            <h3 class="mb-4">Buyer Details</h3>
+                            <dl class="row">
+                                <dt class="col-sm-4">Name:</dt>
+                                <dd class="col-sm-8">@buyer.Name</dd>
+
+                                <dt class="col-sm-4">NIP:</dt>
+                                <dd class="col-sm-8">@buyer.Nip</dd>
+
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">@buyer.Email</dd>
+
+                                <dt class="col-sm-4">Phone:</dt>
+                                <dd class="col-sm-8">@buyer.Phone</dd>
+
+                                @if (buyer.Address != null)
+                                {
+                                    <div class="col-sm-12">
+                                        <h5 class="mt-4">Address:</h5>
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Street:</dt>
+                                            <dd class="col-sm-8">@buyer.Address.Street @buyer.Address.StreetNumber/@buyer.Address.ApartmentNumber</dd>
+
+                                            <dt class="col-sm-4">City:</dt>
+                                            <dd class="col-sm-8">@buyer.Address.City</dd>
+
+                                            <dt class="col-sm-4">Zip Code:</dt>
+                                            <dd class="col-sm-8">@buyer.Address.PostalCode</dd>
+                                        </dl>
+                                    </div>
+                                }
+
+                                <dt class="col-sm-4">Active:</dt>
+                                <dd class="col-sm-8">@(buyer.IsActive ? "Yes" : "No")</dd>
+
+                                <dt class="col-sm-4">Invoices:</dt>
+                                <dd class="col-sm-8">@buyerInvoices.Count()</dd>
+                                <div class="table-responsive col-sm-12">
+                                    @if (buyerInvoices.Count == 0)
+                                    {
+                                        <p>Empty</p>
+                                    }
+                                    else
+                                    {
+                                        <QuickGrid Items="buyerInvoices.AsQueryable()" Class="table table-secondary table-striped">
+                                            <PropertyColumn Property="@(i => i.Number)" Sortable="true"></PropertyColumn>
+                                            <PropertyColumn Property="@(i => i.TotaNetlValue.ToString("0.00 zł"))" Sortable="true"></PropertyColumn>
+                                            <PropertyColumn Property="@(i => i.IsPaid)" Sortable="true"></PropertyColumn>
+                                            <PropertyColumn Property="@(i => i.PaymentDate)" Sortable="true"></PropertyColumn>
+                                        </QuickGrid>
+                                    }
+                                </div>
+                            </dl>
+                        </div>
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickClose { get; set; }
+    [Parameter]
+    public Buyer buyer { get; set; }
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    private DateTime now = DateTime.Now;
+    private List<Invoice> buyerInvoices;
+
+    protected override async void OnParametersSet()
+    {
+        @if (buyer is not null)
+        {
+            var invoices = await _invoiceService.GetUSerInvoicesAsync();
+            buyerInvoices = invoices.Where(i => i.BuyerId == buyer.Id).ToList();
+            StateHasChanged();
+        }
+
+    }
+    private async void Close()
+    {
+        IsVisible = false;
+        buyer = null;
+        buyerInvoices = null;
+        await OnClickClose.InvokeAsync();
+
+    }
+
+    //TODO: Dodać podsumowanie faktur niezapłaconych i po terminie
+}

@@ -4,8 +4,9 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+
 <div class="row" style="margin:50px">
+    <div class="row justify-content-center" style="margin: 50px;">
     <div class="col-md-4">
         <section>
             <form id="account" method="post">
@@ -38,9 +39,11 @@
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                 </div>
                 <div style="margin:10px">
-                    <button id="login-submit" type="submit" class="w-100 btn-lg btn-primary">Register</button>
+                    <button id="register-submit" type="submit" class="w-100 btn-lg btn-primary">Register</button>
+                    <a type="button" class="w-100 btn btn-lg btn-primary my-1" href="/">Home</a>
                 </div>
             </form>
         </section>
+    </div>
     </div>
 </div>

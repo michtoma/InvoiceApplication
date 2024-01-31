@@ -21,7 +21,7 @@ namespace InvoiceApplication.Models.Companies
         public bool IsActive { get; set; }
         public IEnumerable<Invoice> Invoices { get; set; } = new List<Invoice>();
         public Seller? Seller { get; set; }
-        public int? SellerId { get; set; }   
+        public int? SellerId { get; set; }
 
     }
 }

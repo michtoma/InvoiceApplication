@@ -42,7 +42,7 @@ namespace InvoiceApplication.Services.Companies
             using var context = _contextFactoy.CreateDbContext();
             try
             {
-                return await context.Buyers.Include(b=>b.Address).FirstOrDefaultAsync(b=>b.Id==buyerId);
+                return await context.Buyers.Include(b => b.Address).FirstOrDefaultAsync(b => b.Id == buyerId);
             }
             catch (Exception ex)
             {
@@ -60,8 +60,8 @@ namespace InvoiceApplication.Services.Companies
         public async Task<List<Buyer>> GetUserBuyersAsync()
         {
             using var context = _contextFactoy.CreateDbContext();
-            var user =await _userService.GetCurrentUser();
-            return await context.Buyers.Where(b=> b.SellerId==user.Seller.Id).Include(b=>b.Address).ToListAsync();
+            var user = await _userService.GetCurrentUser();
+            return await context.Buyers.Where(b => b.SellerId == user.Seller.Id).Include(b => b.Address).ToListAsync();
         }
 
         public async Task UpdateBuyerAsync(Buyer buyer)

@@ -7,11 +7,11 @@
 <PageTitle>Edit Your Company</PageTitle>
 <AuthorizeView>
     <Authorized>
-        <h3><PageTitle/></h3>
         <EditForm Model="_seller" OnValidSubmit="SubmitForm">
             <ChildContent Context="sellerContext">
                 <DataAnnotationsValidator />
                 <div class="row col-10">
+                    <h3>Edit Your Company</h3>
                     <div class="col-5">
                         <label for="name">Name</label>
                         <InputText id="sellerName" @bind-Value="_seller.Name" class="form-control"></InputText>

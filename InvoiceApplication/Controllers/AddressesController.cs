@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using InvoiceApplication.Data;
+using InvoiceApplication.Models.Companies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using InvoiceApplication.Data;
-using InvoiceApplication.Models.Companies;
 
 namespace InvoiceApplication.Controllers
 {
@@ -25,10 +20,10 @@ namespace InvoiceApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Address>>> GetAddresses()
         {
-          if (_context.Addresses == null)
-          {
-              return NotFound();
-          }
+            if (_context.Addresses == null)
+            {
+                return NotFound();
+            }
             return await _context.Addresses.ToListAsync();
         }
 
@@ -36,10 +31,10 @@ namespace InvoiceApplication.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Address>> GetAddress(int id)
         {
-          if (_context.Addresses == null)
-          {
-              return NotFound();
-          }
+            if (_context.Addresses == null)
+            {
+                return NotFound();
+            }
             var address = await _context.Addresses.FindAsync(id);
 
             if (address == null)
@@ -86,10 +81,10 @@ namespace InvoiceApplication.Controllers
         [HttpPost]
         public async Task<ActionResult<Address>> PostAddress(Address address)
         {
-          if (_context.Addresses == null)
-          {
-              return Problem("Entity set 'AppDbContext.Addresses'  is null.");
-          }
+            if (_context.Addresses == null)
+            {
+                return Problem("Entity set 'AppDbContext.Addresses'  is null.");
+            }
             _context.Addresses.Add(address);
             await _context.SaveChangesAsync();
 

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using InvoiceApplication.Models.Items;
+﻿using InvoiceApplication.Models.Companies;
 using InvoiceApplication.Models.Invoices;
-using InvoiceApplication.Models.Companies;
+using InvoiceApplication.Models.Items;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System.Reflection.Emit;
+using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApplication.Data
 {
