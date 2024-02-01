@@ -16,16 +16,12 @@
                             <dl class="row">
                                 <dt class="col-sm-4">Name:</dt>
                                 <dd class="col-sm-8">@buyer.Name</dd>
-
                                 <dt class="col-sm-4">NIP:</dt>
                                 <dd class="col-sm-8">@buyer.Nip</dd>
-
                                 <dt class="col-sm-4">Email:</dt>
                                 <dd class="col-sm-8">@buyer.Email</dd>
-
                                 <dt class="col-sm-4">Phone:</dt>
                                 <dd class="col-sm-8">@buyer.Phone</dd>
-
                                 @if (buyer.Address != null)
                                 {
                                     <div class="col-sm-12">
@@ -33,21 +29,27 @@
                                         <dl class="row">
                                             <dt class="col-sm-4">Street:</dt>
                                             <dd class="col-sm-8">@buyer.Address.Street @buyer.Address.StreetNumber/@buyer.Address.ApartmentNumber</dd>
-
                                             <dt class="col-sm-4">City:</dt>
                                             <dd class="col-sm-8">@buyer.Address.City</dd>
-
                                             <dt class="col-sm-4">Zip Code:</dt>
                                             <dd class="col-sm-8">@buyer.Address.PostalCode</dd>
                                         </dl>
                                     </div>
                                 }
-
                                 <dt class="col-sm-4">Active:</dt>
                                 <dd class="col-sm-8">@(buyer.IsActive ? "Yes" : "No")</dd>
-
                                 <dt class="col-sm-4">Invoices:</dt>
                                 <dd class="col-sm-8">@buyerInvoices.Count()</dd>
+                                @if (notPaidValue > 0)
+                                {
+                                    <dt class="col-sm-4">Invoices not paid value:</dt>
+                                    <dd class="col-sm-8">@notPaidValue.ToString("0.00 zł")</dd>
+                                }
+                                @if (afterDeadlineValue > 0)
+                                {
+                                    <dt class="col-sm-4">Invoices not paid after deadline:</dt>
+                                    <dd class="col-sm-8">@afterDeadlineValue.ToString("0.00 zł")</dd>
+                                }
                                 <div class="table-responsive col-sm-12">
                                     @if (buyerInvoices.Count == 0)
                                     {
@@ -57,7 +59,7 @@
                                     {
                                         <QuickGrid Items="buyerInvoices.AsQueryable()" Class="table table-secondary table-striped">
                                             <PropertyColumn Property="@(i => i.Number)" Sortable="true"></PropertyColumn>
-                                            <PropertyColumn Property="@(i => i.TotaNetlValue.ToString("0.00 zł"))" Sortable="true"></PropertyColumn>
+                                            <PropertyColumn Property="@(i => i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
                                             <PropertyColumn Property="@(i => i.IsPaid)" Sortable="true"></PropertyColumn>
                                             <PropertyColumn Property="@(i => i.PaymentDate)" Sortable="true"></PropertyColumn>
                                         </QuickGrid>
@@ -66,7 +68,6 @@
                             </dl>
                         </div>
                     }
-
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="Close">Close</button>
@@ -83,8 +84,9 @@
     public Buyer buyer { get; set; }
     [Parameter]
     public bool IsVisible { get; set; }
-
-    private DateTime now = DateTime.Now;
+    public double afterDeadlineValue;
+    public double notPaidValue;
+    private DateTime dateNow = DateTime.Now;
     private List<Invoice> buyerInvoices;
 
     protected override async void OnParametersSet()
@@ -93,6 +95,9 @@
         {
             var invoices = await _invoiceService.GetUSerInvoicesAsync();
             buyerInvoices = invoices.Where(i => i.BuyerId == buyer.Id).ToList();
+            var afterDeadlineInvoices = buyerInvoices.Where(i => i.IsPaid = false && i.PaymentDate < dateNow).ToList();
+            afterDeadlineValue = buyerInvoices.Where(i => i.IsPaid == false).Where(i => i.PaymentDate < dateNow).Sum(i => i.TotaNetlValue);
+            notPaidValue = buyerInvoices.Where(i => i.IsPaid == false).Sum(i => i.TotaNetlValue);
             StateHasChanged();
         }
 
@@ -103,8 +108,5 @@
         buyer = null;
         buyerInvoices = null;
         await OnClickClose.InvokeAsync();
-
     }
-
-    //TODO: Dodać podsumowanie faktur niezapłaconych i po terminie
 }
