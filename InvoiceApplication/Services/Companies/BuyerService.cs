@@ -61,7 +61,7 @@ namespace InvoiceApplication.Services.Companies
         {
             using var context = _contextFactoy.CreateDbContext();
             var user = await _userService.GetCurrentUser();
-            return await context.Buyers.Where(b => b.SellerId == user.Seller.Id).Include(b => b.Address).ToListAsync();
+            return await context.Buyers.Where(b => b.SellerId == user.Seller.Id).Include(b => b.Address).Include(b => b.Invoices).ToListAsync();
         }
 
         public async Task UpdateBuyerAsync(Buyer buyer)

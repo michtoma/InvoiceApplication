@@ -42,5 +42,13 @@ namespace InvoiceApplication.Models.Invoices
                 return InvoiceItems.Sum(i => i.TotalGrossValue);
             }
         }
+        public bool IsOverdue
+        {
+            get
+            {
+                if (IsPaid) return false;
+                else return PaymentDate < DateTime.Now;
+            }
+        }
     }
 }

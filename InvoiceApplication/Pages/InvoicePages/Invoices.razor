@@ -30,48 +30,51 @@
                 </div>
 
                 <div class="table-responsive">
-                <QuickGrid Items="FilteredInvoices" Pagination="_paginationState" ResizableColumns="true" Class="table table-responsive table-secondary table-striped table-bordered">
-                    <PropertyColumn Property="@(i=>i.Number)" Sortable="true">
-                    </PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.Buyer.Nip)" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i => i.Buyer.Name)" Sortable="true">
-                        <ColumnOptions>
-                            <i class="bi bi-search"></i>
-                            <input type="serch" class="serch" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Search" />
-                        </ColumnOptions>
-                    </PropertyColumn>
+                    <QuickGrid Items="FilteredInvoices" Pagination="_paginationState" ResizableColumns="true" Class="table table-responsive table-secondary table-striped table-bordered">
+                        <PropertyColumn Property="@(i=>i.Number)" Sortable="true">
+                        </PropertyColumn>
+                        <PropertyColumn Property="@(i=>i.Buyer.Nip)" Sortable="true"></PropertyColumn>
+                        <PropertyColumn Property="@(i => i.Buyer.Name)" Sortable="true">
+                            <ColumnOptions>
+                                <i class="bi bi-search"></i>
+                                <input type="serch" class="serch" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Search" />
+                            </ColumnOptions>
+                        </PropertyColumn>
 
-                    <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.PaymentDate)" Format="dd-MM-yyyy" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true">
-                        <ColumnOptions>
-                            <p>Min: <input type="number" @bind="minValue" @bind:event="oninput" min="0" max="9999" /> <span class="inline-block w-10"></span></p>
-                            <p>Min: <input type="range" @bind="minValue" @bind:event="oninput" min="0" max="9999" /> <span class="inline-block w-10"></span></p>
-                            <p>Max: <input type="number" @bind="maxValue" @bind:event="oninput" min="0" max="99999" /> <span class="inline-block w-10"></span></p>
-                            <p>Max: <input type="range" @bind="maxValue" @bind:event="oninput" min="0" max="99999" /> <span class="inline-block w-10"></span></p>
-                        </ColumnOptions>
-                    </PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.TotalGrossValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.IsPaid)" Sortable="true"></PropertyColumn>
-                    <PropertyColumn Property="@(i=>i.IsEditable)" Sortable="true"></PropertyColumn>
-                    <TemplateColumn Title="Action Buttons">
-                        <button class="btn btn-outline-danger btn-sm me-1" @onclick="()=> ShowInvoiceDetails(context.Id)">View</button>
-                        @if (context.IsEditable)
-                        {
-                            <button class="btn btn-outline-secondary btn-sm" @onclick="()=> EditHeader(context.Id)">Edit</button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-outline-primary btn-sm">Print</button>
-                            <button class="btn btn-outline-success btn-sm">Send by Email </button>
+                        <PropertyColumn Property="@(i=>i.CreateDate)" Format="dd-MM-yyyy" Title="Create date" Sortable="true"></PropertyColumn>
+                        <PropertyColumn Property="@(i=>i.TotaNetlValue)" Format="0.00 zł" Sortable="true">
+                            <ColumnOptions>
+                                <p>Min: <input type="number" @bind="minValue" @bind:event="oninput" min="0" max="9999" /> <span class="inline-block w-10"></span></p>
+                                <p>Min: <input type="range" @bind="minValue" @bind:event="oninput" min="0" max="9999" /> <span class="inline-block w-10"></span></p>
+                                <p>Max: <input type="number" @bind="maxValue" @bind:event="oninput" min="0" max="99999" /> <span class="inline-block w-10"></span></p>
+                                <p>Max: <input type="range" @bind="maxValue" @bind:event="oninput" min="0" max="99999" /> <span class="inline-block w-10"></span></p>
+                            </ColumnOptions>
+                        </PropertyColumn>
+                        <PropertyColumn Property="@(i=>i.IsPaid)" Sortable="true" Title="Is Paid"></PropertyColumn>
+                        <PropertyColumn Property="@(i=>i.IsOverdue)" Sortable="true" Title="Is Overdue"></PropertyColumn>
+                        <TemplateColumn Title="Action Buttons">
+                            <button class="btn btn-outline-danger btn-sm me-1" @onclick="()=> ShowInvoiceDetails(context.Id)">View</button>
+                            @if (context.IsEditable)
+                            {
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="()=> EditHeader(context.Id)">Edit</button>
+                                <button class="btn btn-outline-warning btn-sm" @onclick="()=> FinalizeInvoice(context)">Finalize</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-primary btn-sm">Print</button>
+                                <button class="btn btn-outline-success btn-sm">Send by Email </button>
+                                if (!context.IsPaid)
+                                {
+                                    <button class="btn btn-warning btn-sm ms-1" @onclick="()=> SetAsPaid(context)">Mark as Paid </button>
+                                }
 
-                        }
-                    </TemplateColumn>
-                </QuickGrid>
+                            }
+                        </TemplateColumn>
+                    </QuickGrid>
 
 
-                <Paginator Value="_paginationState" />
-            </div>
+                    <Paginator Value="_paginationState" />
+                </div>
             }
         </div>
     </ChildContent>
@@ -125,6 +128,12 @@
     private async Task FinalizeInvoice(Invoice invoice)
     {
         await InvoiceService.FinalizeInvoice(invoice);
+        StateHasChanged();
+    }
+    private async Task SetAsPaid(Invoice invoice)
+    {
+        invoice.IsPaid = true;
+        await InvoiceService.UpdateInvoiceAsync(invoice);
         StateHasChanged();
     }
 }

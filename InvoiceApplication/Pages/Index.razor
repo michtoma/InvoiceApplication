@@ -1,12 +1,15 @@
 ﻿@page "/"
-@inject ISellerService Sellerservice
-@inject IAppUserService UserService
-@inject AuthenticationStateProvider Auth
+@inject ISellerService _sellerservice
+@inject IBuyerService _buyerservice
+@inject IAppUserService _userService
+@inject IInvoiceService _invoiceService
 
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
-    <h1>Hello @_user.FirstName @_user.LastName</h1>
-    @if (_seller is null)
+    <div class="container mt-4">
+        <h1>Hello @user.FirstName @user.LastName</h1>
+    </div>
+    @if (seller is null)
     {
         <p>You didn't set your company, without that you can't create new invoice.</p>
         <p>Please do that:</p>
@@ -15,75 +18,184 @@
     else
     {
         <div class="container mt-4">
-            <h4>Your Company:</h4>
-            <table class="table table-secondary table-bordered">
+            <div class="row">
+                <div class="col-md-6 border rounded p-2">
+                    <h4>Your Company:</h4>
+                    <table class="table table-secondary table-bordered rounded">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Name</th>
+                                <td>@seller.Name</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Nip</th>
+                                <td>@seller.Nip</td>
+                            </tr>
+                            <tr class="d-none">
+                                <th scope="row">Id</th>
+                                <td>@seller.Id</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Phone</th>
+                                <td>@seller.Phone</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Email</th>
+                                <td>@seller.Email</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Vat Payer</th>
+                                <td>@seller.IsVatPayer</td>
+                            </tr>
 
-                <tbody>
-                    <tr>
-                        <th scope="row">Name</th>
-                        <td>@_seller.Name</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Nip</th>
-                        <td>@_seller.Nip</td>
-                    </tr>
-                    <tr class="d-none">
-                        <th scope="row">Id</th>
-                        <td>@_seller.Id</td>
-                    </tr>
-                    @if (!(_seller.Address is null))
-                    {
-                        <tr>
-                            <th scope="row">Postal Code</th>
-                            <td>@_seller.Address.PostalCode</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">City</th>
-                            <td>@_seller.Address.City</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Street</th>
-                            <td>@_seller.Address.Street</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Street Number</th>
-                            <td>@_seller.Address.StreetNumber</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Apartment Number</th>
-                            <td>@_seller.Address.ApartmentNumber</td>
-                        </tr>
-                    }
-                    <tr>
-                        <th scope="row">Phone</th>
-                        <td>@_seller.Phone</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Email</th>
-                        <td>@_seller.Email</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Vat Payer</th>
-                        <td>@_seller.IsVatPayer</td>
-                    </tr>
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6 border rounded p-2">
+                    <h4>Company Address:</h4>
+                    <table class="table table-secondary table-bordered">
+                        <tbody>
+                            @if (!(seller.Address is null))
+                            {
+                                <tr>
+                                    <th scope="row">Postal Code</th>
+                                    <td>@seller.Address.PostalCode</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">City</th>
+                                    <td>@seller.Address.City</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Street</th>
+                                    <td>@seller.Address.Street</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Street Number</th>
+                                    <td>@seller.Address.StreetNumber</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Apartment Number</th>
+                                    <td>@seller.Address.ApartmentNumber</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6 border rounded p-2">
+                    <h4>Invoices summary:</h4>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="startDate" class="mr-1">From:</label>
+                            <input type="date" id="startDate" @bind="startDate" @bind:event="oninput" class="form-control mr-2" />
+                        </div>
+
+                        <div class="col-md-5">
+
+                            <label for="endDate" class="mr-1">To:</label>
+                            <input type="date" id="endDate" @bind="endDate" @bind:event="oninput" class="form-control mb-1" />
+                        </div>
+                    </div>
+                    <table class="table table-secondary table-bordered">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Quantity</th>
+                                <td>@filteredInvoices.Count()</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Net Value</th>
+                                <td>@filteredInvoices.Sum(i=>i.TotaNetlValue).ToString("0.00 zł")</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Paid Quantity</th>
+                                <td>@filteredInvoices.Where(i=>i.IsPaid==true).Count()</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Paid Value</th>
+                                <td>@filteredInvoices.Where(i=>i.IsPaid==true).Sum(i=>i.TotaNetlValue).ToString("0.00 zł")</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Not Paid Quantity</th>
+                                <td>@filteredInvoices.Where(i=>i.IsPaid==false).Count()</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Not Paid Value</th>
+                                <td>@filteredInvoices.Where(i=>i.IsPaid==false).Sum(i=>i.TotaNetlValue).ToString("0.00 zł")</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Overdue Quantity</th>
+                                <td>@filteredInvoices.Where(i=>i.IsOverdue==true).Count()</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Overdue Value</th>
+                                <td>@filteredInvoices.Where(i=>i.IsOverdue==true).Sum(i=>i.TotaNetlValue).ToString("0.00 zł")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-6 border rounded p-2">
+                    <h4>Clients Summary:</h4>
+                    <table class="table table-secondary table-bordered">
+                        <tbody>
+                            @if (!(userBuyers is null))
+                            {
+                                <tr>
+                                    <th scope="row">Quantity</th>
+                                    <td>@userBuyers.Count()</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Active</th>
+                                    <td>@userBuyers.Where(b=>b.IsActive==true).Count()</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">With invoice</th>
+                                    <td>@userBuyers.Where(b=>b.Invoices.Count()>0).Count()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     }
 
 </AuthorizeView>
 
 @code {
-    private AppUser _user = new AppUser();
-    private Seller _seller = new Seller();
-    protected override async Task OnInitializedAsync()
+    private AppUser user = new AppUser();
+    private Seller seller = new Seller();
+    private List<Invoice> userInvoices = new();
+    private List<Buyer> userBuyers = new();
+    private DateTime dateTimeNow = DateTime.Now;
+    private DateTime startDate;
+    private DateTime endDate = DateTime.Now;
+    IQueryable<Invoice> filteredInvoices
     {
-        var authState = await Auth.GetAuthenticationStateAsync();
-        var authUser = authState.User;
-        var users = await UserService.GetAll();
-        _user = users.FirstOrDefault(u => u.UserName == authUser.Identity.Name);
-        var sellers = await Sellerservice.GetAllSellersAsync();
-        _seller = sellers.FirstOrDefault(s => s.User.Id == _user.Id);
+        get
+        {
+            if (startDate > endDate)
+            {
+                startDate = endDate;
+                StateHasChanged();
+            }
+            return userInvoices.Where(i => i.CreateDate > startDate && i.CreateDate < endDate).AsQueryable();
+
+        }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userService.GetCurrentUser();
+        var sellers = await _sellerservice.GetAllSellersAsync();
+        seller = sellers.FirstOrDefault(s => s.User.Id == user.Id);
+        userInvoices = await _invoiceService.GetUSerInvoicesAsync();
+        startDate = userInvoices.Min(i => i.CreateDate);
+        userBuyers = await _buyerservice.GetUserBuyersAsync();
+    }
 }
