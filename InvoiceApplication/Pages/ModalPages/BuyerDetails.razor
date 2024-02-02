@@ -58,7 +58,7 @@
                                     else
                                     {
                                         <QuickGrid Items="buyerInvoices.AsQueryable()" Class="table table-secondary table-striped">
-                                            <PropertyColumn Property="@(i => i.Number)" Sortable="true"></PropertyColumn>
+                                            <PropertyColumn Property="@(i => i.Number)"></PropertyColumn>
                                             <PropertyColumn Property="@(i => i.TotaNetlValue)" Format="0.00 zł" Sortable="true"></PropertyColumn>
                                             <PropertyColumn Property="@(i => i.IsPaid)" Sortable="true"></PropertyColumn>
                                             <PropertyColumn Property="@(i => i.PaymentDate)" Sortable="true"></PropertyColumn>
@@ -95,8 +95,7 @@
         {
             var invoices = await _invoiceService.GetUSerInvoicesAsync();
             buyerInvoices = invoices.Where(i => i.BuyerId == buyer.Id).ToList();
-            var afterDeadlineInvoices = buyerInvoices.Where(i => i.IsPaid = false && i.PaymentDate < dateNow).ToList();
-            afterDeadlineValue = buyerInvoices.Where(i => i.IsPaid == false).Where(i => i.PaymentDate < dateNow).Sum(i => i.TotaNetlValue);
+            afterDeadlineValue = buyerInvoices.Where(i => i.IsOverdue).Sum(i => i.TotaNetlValue);
             notPaidValue = buyerInvoices.Where(i => i.IsPaid == false).Sum(i => i.TotaNetlValue);
             StateHasChanged();
         }

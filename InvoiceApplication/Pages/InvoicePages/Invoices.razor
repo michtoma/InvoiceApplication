@@ -1,6 +1,8 @@
 ﻿@page "/invoices"
-@inject IInvoiceService InvoiceService
-@inject NavigationManager NavigationManager
+@using InvoiceApplication.Services.Pdf;
+@inject IInvoiceService _invoiceService
+@inject IPdfService _pdfService
+@inject NavigationManager _navigationManager
 
 <PageTitle>Invoice List</PageTitle>
 <AuthorizeView>
@@ -21,7 +23,7 @@
             {
                 <div class="page-size-chooser">
                     Items per page:
-                    <select class="btn btn-secondary" @bind="@_paginationState.ItemsPerPage">
+                    <select class="btn btn-secondary" @bind="@paginationState.ItemsPerPage">
                         <option>5</option>
                         <option>10</option>
                         <option>20</option>
@@ -30,7 +32,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <QuickGrid Items="FilteredInvoices" Pagination="_paginationState" ResizableColumns="true" Class="table table-responsive table-secondary table-striped table-bordered">
+                    <QuickGrid Items="filteredInvoices" Pagination="paginationState" ResizableColumns="true" Class="table table-responsive table-secondary table-striped table-bordered">
                         <PropertyColumn Property="@(i=>i.Number)" Sortable="true">
                         </PropertyColumn>
                         <PropertyColumn Property="@(i=>i.Buyer.Nip)" Sortable="true"></PropertyColumn>
@@ -61,7 +63,7 @@
                             }
                             else
                             {
-                                <button class="btn btn-outline-primary btn-sm">Print</button>
+                                <button class="btn btn-outline-primary btn-sm" @onclick="()=>Print(context)">Print</button>
                                 <button class="btn btn-outline-success btn-sm">Send by Email </button>
                                 if (!context.IsPaid)
                                 {
@@ -73,7 +75,7 @@
                     </QuickGrid>
 
 
-                    <Paginator Value="_paginationState" />
+                    <Paginator Value="paginationState" />
                 </div>
             }
         </div>
@@ -82,12 +84,12 @@
 
 @code {
     string nameFilter;
-    bool _isVisible = false;
+    bool isVisible = false;
     private IQueryable<Invoice>? _invoices;
-    PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
     int minValue;
     int maxValue = 999999999;
-    IQueryable<Invoice> FilteredInvoices
+    IQueryable<Invoice> filteredInvoices
     {
         get
         {
@@ -108,32 +110,36 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        _invoices = (await InvoiceService.GetUSerInvoicesAsync()).AsQueryable();
+        _invoices = (await _invoiceService.GetUSerInvoicesAsync()).AsQueryable();
     }
     private void EditHeader(int invoiceId)
     {
-        NavigationManager.NavigateTo($"invoiceAction/{invoiceId}");
+        _navigationManager.NavigateTo($"invoiceAction/{invoiceId}");
     }
     private void ShowInvoiceDetails(int invoiceId)
     {
-        NavigationManager.NavigateTo($"invoice/{invoiceId}");
+        _navigationManager.NavigateTo($"invoice/{invoiceId}");
     }
     private async Task DeleteInvoice(int invoiceId)
     {
-        var invoiceToDelete = await InvoiceService.GetInvoiceByIdAsync(invoiceId);
-        await InvoiceService.DeleteInvoiceAsync(invoiceToDelete);
-        _invoices = (await InvoiceService.GetUSerInvoicesAsync()).AsQueryable();
+        var invoiceToDelete = await _invoiceService.GetInvoiceByIdAsync(invoiceId);
+        await _invoiceService.DeleteInvoiceAsync(invoiceToDelete);
+        _invoices = (await _invoiceService.GetUSerInvoicesAsync()).AsQueryable();
         StateHasChanged();
     }
     private async Task FinalizeInvoice(Invoice invoice)
     {
-        await InvoiceService.FinalizeInvoice(invoice);
+        await _invoiceService.FinalizeInvoice(invoice);
         StateHasChanged();
     }
     private async Task SetAsPaid(Invoice invoice)
     {
         invoice.IsPaid = true;
-        await InvoiceService.UpdateInvoiceAsync(invoice);
+        await _invoiceService.UpdateInvoiceAsync(invoice);
         StateHasChanged();
+    }
+    private async Task Print(Invoice invoice)
+    {
+        _navigationManager.NavigateTo($"/pdf/invoice/{invoice.Id}");
     }
 }

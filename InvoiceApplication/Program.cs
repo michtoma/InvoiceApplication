@@ -3,6 +3,7 @@ using InvoiceApplication.Models.Companies;
 using InvoiceApplication.Services.Companies;
 using InvoiceApplication.Services.Invoices;
 using InvoiceApplication.Services.Items;
+using InvoiceApplication.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<ISellerService, SellerService>();
 builder.Services.AddScoped<IAddresService, AddresService>();
 builder.Services.AddScoped<IAppUserService, AppUserService>();
 builder.Services.AddScoped<INumberGenerator, NumberGenerator>();
+builder.Services.AddScoped<IPdfService, PdfService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,0 +1,169 @@
+﻿@page "/pdf/invoice/{invoiceId:int?}"
+@layout EmptyLayout
+@inject IJSRuntime JSRuntime
+@inject IInvoiceService Service
+@inject IBuyerService BuyerServie
+@inject ISellerService SellerService
+@inject IAppUserService _userService
+@inject NavigationManager _navigationManger
+@if (_invoice is null)
+{
+    <h1>It looks like there's nothing here.</h1>
+}
+else
+{
+    @if (buttonVisibility)
+    {
+        <button class="btn btn-primary" @onclick="PrintPage">Print</button>
+        <button class="btn btn-success" @onclick="SendByEmail">Send by Email</button>
+    }
+    <div class="invoice-header">
+        <h4 class="text-end">@_invoice.SellerAddress.City, @_invoice.CreateDate.ToShortDateString()</h4>
+        <h1 class="text-center">Faktura numer @_invoice.Number</h1>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="invoice-header-info">
+                    <div>@_seller.Name</div>
+                    <div>@_seller.Address.Street @_seller.Address.StreetNumber/@_seller.Address.ApartmentNumber</div>
+                    <div>@_seller.Address.PostalCode @_seller.Address.City</div>
+                    <div>NIP: @_seller.Nip</div>
+                    <div>Email: @_seller.Email</div>
+                    <div>Phone: @_seller.Phone</div>
+                </div>
+            </div>
+            <div class="col-6 text-right">
+                <div class="invoice-header-info">
+                    <div>@_buyer.Name</div>
+                    <div>@_buyer.Address.Street @_buyer.Address.StreetNumber/@_buyer.Address.ApartmentNumber</div>
+                    <div>@_buyer.Address.PostalCode @_buyer.Address.City</div>
+                    <div>NIP: @_buyer.Nip</div>
+                    <div>Email: @_buyer.Email</div>
+                    <div>Phone: @_buyer.Phone</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="invoice-container">
+        <table class="table table-sm table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Description</th>
+                    <th>Unit</th>
+                    <th>Net Price</th>
+                    <th>Quantity</th>
+                    <th>Total Net Value</th>
+                    <th>VAT Rate</th>
+                    <th>Total Gross Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_invoice.InvoiceItems.Any())
+                {
+                    @foreach (var (item, index) in _invoice.InvoiceItems.Select((item, index) => (item, index)))
+                    {
+                        <tr>
+                            <td>@(index + 1)</td>
+                            <td class="col-5">
+                                @item.Item.Name @if (item.Description != "")
+                                {
+                                    <br />
+                                    @item.Description
+                                }
+                            </td>
+
+                            <td>@item.Item.UnitOfMeasure.ShortName</td>
+                            <td>@item.NetPrice.ToString("0.00 zł")</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.TotalNetValue.ToString("0.00 zł")</td>
+                            <td>@item.VatRate</td>
+                            <td>@item.TotalGrossValue.ToString("0.00 zł")</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="4"></td>
+                        <th>Total:</th>
+                        <th>@_invoice.InvoiceItems.Sum(i => i.TotalNetValue).ToString("0.00 zł")</th>
+                        <td>XXX</td>
+                        <th>@_invoice.InvoiceItems.Sum(i => i.TotalGrossValue).ToString("0.00 zł")</th>
+                    </tr>
+                }
+
+            </tbody>
+            <tfoot>
+                <tr class="text-center">
+                    <th colspan="7" class="text-end">Payment Deadlin: @_invoice.PaymentDate.ToShortDateString()</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+
+    </div>
+    <div class="row p-5">
+        <div class="col-6 text-center">
+            <p>Issuing the invoice</p>
+            <p>........................................</p>
+        </div>
+        <div class="col-6 text-center">
+            <p>Receiving the invoice</p>
+            <p>........................................</p>
+
+        </div>
+
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int InvoiceId { get; set; }
+    private Invoice _invoice;
+    private Buyer _buyer;
+    private Seller _seller;
+    bool buttonVisibility = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!(InvoiceId == 0))
+        {
+            _invoice = await Service.GetInvoiceByIdAsync((int)InvoiceId);
+            if (await CheckUser())
+            {
+                _buyer = await BuyerServie.GetBuyerByIdAsync((int)_invoice.BuyerId);
+                _seller = await SellerService.GetSellerByIdAsync((int)_invoice.SellerId);
+            }
+
+        }
+    }
+    private async Task PrintPage()
+    {
+            buttonVisibility = !buttonVisibility;
+        if (await CheckUser())
+        {
+            await JSRuntime.InvokeVoidAsync("printPage");
+            _navigationManger.NavigateTo("invoices");
+
+        }
+    }
+    // Method to check user authorization
+    private async Task<bool> CheckUser()
+    {
+        var userId = await _userService.GetLoggedUserId();
+        if (_invoice.AppUserId == userId) return true;
+        else _navigationManger.NavigateTo(""); return false;
+    }
+    private async Task SendByEmail()
+    {
+        if (await CheckUser())
+        {
+            //TODO: Implement mail Sending
+        }
+    }
+
+}
+<script>
+    function printPage() {
+        window.print();
+    }
+</script>
